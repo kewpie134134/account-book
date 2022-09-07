@@ -22,6 +22,7 @@ class InputForm extends ConsumerWidget {
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final Map<String, dynamic> _data = {
+    // モック用の仮データ
     "id": 0,
     "type": 0,
     "detail": "",
@@ -30,7 +31,8 @@ class InputForm extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var groupValue = ref.watch(inputFormProvider);
+    final groupValue = ref.watch(inputFormProvider);
+    final inputFormController = ref.read(inputFormProvider.notifier);
     return Scaffold(
       appBar: AppBar(
         title: const Text("家計簿登録"),
@@ -41,9 +43,9 @@ class InputForm extends ConsumerWidget {
           child: ListView(
             padding: const EdgeInsets.all(20.0),
             children: <Widget>[
-              _createRadioListColumn(ref, groupValue),
+              _createRadioListColumn(inputFormController, groupValue),
               _createTextFieldColumn(),
-              _createSaveIconButton(ref, context, _formKey),
+              _createSaveIconButton(inputFormController, context, _formKey),
             ],
           ),
         ),
@@ -51,27 +53,29 @@ class InputForm extends ConsumerWidget {
     );
   }
 
-  Widget _createRadioListColumn(WidgetRef ref, RadioValue groupValue) {
+  Widget _createRadioListColumn(
+      InputFormState inputFormController, RadioValue groupValue) {
     return Padding(
       padding: const EdgeInsets.all(0),
       child: Column(
         children: [
-          _createRadioList(ref, groupValue, RadioValue.income),
-          _createRadioList(ref, groupValue, RadioValue.spending),
+          _createRadioList(inputFormController, groupValue, RadioValue.income),
+          _createRadioList(
+              inputFormController, groupValue, RadioValue.spending),
         ],
       ),
     );
   }
 
-  Widget _createRadioList(
-      WidgetRef ref, RadioValue groupValue, RadioValue value) {
+  Widget _createRadioList(InputFormState inputFormController,
+      RadioValue groupValue, RadioValue value) {
     String text = value == RadioValue.spending ? "支出" : "収入";
 
     return RadioListTile(
       title: Text(text),
       value: value,
       groupValue: groupValue,
-      onChanged: (value) => _onRadioSelected(value, ref),
+      onChanged: (value) => _onRadioSelected(value, inputFormController),
     );
   }
 
@@ -129,8 +133,8 @@ class InputForm extends ConsumerWidget {
     );
   }
 
-  Widget _createSaveIconButton(
-      WidgetRef ref, BuildContext context, GlobalKey<FormState> formKey) {
+  Widget _createSaveIconButton(InputFormState inputFormController,
+      BuildContext context, GlobalKey<FormState> formKey) {
     return Padding(
       padding: const EdgeInsets.all(30),
       child: ElevatedButton(
@@ -138,16 +142,14 @@ class InputForm extends ConsumerWidget {
         onPressed: () {
           formKey.currentState?.save();
           _data["type"] =
-              ref.read(inputFormProvider.notifier).state == RadioValue.income
-                  ? 1
-                  : 0;
+              inputFormController.state == RadioValue.income ? 1 : 0;
           Navigator.of(context).pop<dynamic>();
         },
       ),
     );
   }
 
-  void _onRadioSelected(value, WidgetRef ref) {
-    ref.read(inputFormProvider.notifier).changeState(value);
+  void _onRadioSelected(value, InputFormState inputFormController) {
+    inputFormController.changeState(value);
   }
 }
