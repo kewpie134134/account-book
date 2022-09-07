@@ -11,6 +11,9 @@ class InputFormState extends StateNotifier<RadioValue> {
   void changeState(value) {
     state = value;
   }
+
+  @override
+  get state;
 }
 
 // StateNotifierProvider で状態を発信する
