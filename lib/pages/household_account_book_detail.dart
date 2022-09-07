@@ -10,13 +10,6 @@ class PieData {
 class HouseholdAccountBookDetail extends StatelessWidget {
   const HouseholdAccountBookDetail({Key? key}) : super(key: key);
 
-  // ★ 必要か検討
-  //   static Route<dynamic> route() {
-  //   return MaterialPageRoute<dynamic>(
-  //     builder: (_) => HouseholdAccountBookDetail(),
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

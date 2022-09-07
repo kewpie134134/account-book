@@ -32,7 +32,7 @@ class DrawerMenu extends StatelessWidget {
               Navigator.of(context).push<dynamic>(
                 MaterialPageRoute(
                   builder: (context) {
-                    return const HouseholdAccountBookList();
+                    return HouseholdAccountBookList();
                   },
                 ),
               );
