@@ -17,7 +17,9 @@ class HouseholdAccountBookDetail extends StatelessWidget {
         title: const Text("収入支出"),
       ),
       drawer: const DrawerMenu(),
-      body: const Text("円グラフを表示させたい"),
+      body: const Center(
+        child: Text("ここにホーム画面を作成したい"),
+      ),
     );
   }
 }
