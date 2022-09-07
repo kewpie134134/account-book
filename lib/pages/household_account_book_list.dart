@@ -1,5 +1,6 @@
 import 'package:account_book/components/drawer_menu.dart';
 import 'package:account_book/mocks/data.dart';
+import 'package:account_book/pages/household_account_book_input.dart';
 import 'package:flutter/material.dart';
 
 class HouseholdAccountBookList extends StatelessWidget {
@@ -44,7 +45,13 @@ class HouseholdAccountBookList extends StatelessWidget {
         floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
           onPressed: () {
-            // _onPressAddButton(context);
+            Navigator.of(context).push<dynamic>(
+              MaterialPageRoute(
+                builder: (context) {
+                  return InputForm();
+                },
+              ),
+            );
           },
         ),
       ),
