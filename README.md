@@ -20,19 +20,19 @@ samples, guidance on mobile development, and a full API reference.
 - Collection: users
   - Document: [username]
     - Collection: datetime
-      - Document: [yyyymmddhhmmss.xxx]
+      - Document: [yyyyMMddHHmmssSSS]
         - Data:
         - "type"
           - [income]
-          - "date"
-            - [yyyymmddhhmmss.xxx]
-          - "store" (only spending)
-            - [stonename]
-          - "item"
-            - [itemname]
-          - "payment" (only spending)
-            - [paymentmethod]
-          - "amount"
-            - [1000]
-          - "detail"
-            - [XXXXXXXXXX]
+        - "date"
+          - [yyyymmddhhmmss.xxx]
+        - "store" (only spending)
+          - [stonename]
+        - "item"
+          - [itemname]
+        - "payment" (only spending)
+          - [paymentmethod]
+        - "amount"
+          - [1000]
+        - "detail"
+          - [XXXXXXXXXX]

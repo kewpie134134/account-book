@@ -2,16 +2,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 class InputFormPage extends ConsumerWidget {
   InputFormPage({Key? key}) : super(key: key);
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final List<Tab> _tabs = const <Tab>[
     Tab(text: "支出"),
     Tab(text: "収入"),
   ];
 
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final Map<String, dynamic> _data = {
     // モック用の仮データ
     "id": 0,
@@ -253,15 +255,17 @@ class InputFormPage extends ConsumerWidget {
       child: ElevatedButton(
         child: const Text("登録"),
         onPressed: () async {
+          // validate を実行
           if (formKey.currentState!.validate()) {
-            // validate を実行
+            final DateTime now = DateTime.now();
+            _data["date"] = DateFormat("yyyyMMddHHmmssSSS").format(now);
             formKey.currentState?.save(); // Form の onSaved 関数を実行する
             // Navigator.of(context).pop<dynamic>();
             await FirebaseFirestore.instance
                 .collection("users")
-                .doc("id_abc")
+                .doc("user1")
                 .collection("date")
-                .doc("0902")
+                .doc(_data["date"])
                 .set(_data);
           }
         },
