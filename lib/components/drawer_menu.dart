@@ -1,5 +1,6 @@
 import 'package:account_book/pages/home.dart';
 import 'package:account_book/pages/list.dart';
+import 'package:account_book/pages/list_2.dart';
 import 'package:flutter/material.dart';
 
 class DrawerMenu extends StatelessWidget {
@@ -35,6 +36,19 @@ class DrawerMenu extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) {
                     return const ListPage();
+                  },
+                ),
+              );
+            },
+          ),
+          ListTile(
+            title: const Text("家計簿一覧(FB)"),
+            onTap: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).push<dynamic>(
+                MaterialPageRoute(
+                  builder: (context) {
+                    return const ListPage2();
                   },
                 ),
               );

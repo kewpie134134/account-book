@@ -3,14 +3,14 @@ import 'package:account_book/mocks/data.dart';
 import 'package:account_book/pages/input_form.dart';
 import 'package:flutter/material.dart';
 
+const List<Tab> _tabs = <Tab>[
+  Tab(text: "総合"),
+  Tab(text: "収入"),
+  Tab(text: "支出"),
+];
+
 class ListPage extends StatelessWidget {
   const ListPage({Key? key}) : super(key: key);
-
-  final List<Tab> _tabs = const <Tab>[
-    Tab(text: "総合"),
-    Tab(text: "収入"),
-    Tab(text: "支出"),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class ListPage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text("家計簿一覧"),
-          bottom: TabBar(
+          bottom: const TabBar(
             tabs: _tabs,
           ),
         ),
