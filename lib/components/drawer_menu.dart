@@ -1,5 +1,5 @@
-import 'package:account_book/pages/household_account_book_detail.dart';
-import 'package:account_book/pages/household_account_book_list.dart';
+import 'package:account_book/pages/home.dart';
+import 'package:account_book/pages/list.dart';
 import 'package:flutter/material.dart';
 
 class DrawerMenu extends StatelessWidget {
