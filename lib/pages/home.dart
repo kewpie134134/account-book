@@ -9,16 +9,14 @@ class PieData {
   PieData(this.activity, this.money);
 }
 
-class HouseholdAccountBookDetail extends StatefulWidget {
-  const HouseholdAccountBookDetail({Key? key}) : super(key: key);
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
 
   @override
-  State<HouseholdAccountBookDetail> createState() =>
-      _HouseholdAccountBookDetailState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _HouseholdAccountBookDetailState
-    extends State<HouseholdAccountBookDetail> {
+class _HomePageState extends State<HomePage> {
   int touchedIndex = -1;
 
   @override

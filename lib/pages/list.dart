@@ -1,10 +1,10 @@
 import 'package:account_book/components/drawer_menu.dart';
 import 'package:account_book/mocks/data.dart';
-import 'package:account_book/pages/input_form.dart';
+import 'package:account_book/components/input_form.dart';
 import 'package:flutter/material.dart';
 
-class HouseholdAccountBookList extends StatelessWidget {
-  const HouseholdAccountBookList({Key? key}) : super(key: key);
+class ListPage extends StatelessWidget {
+  const ListPage({Key? key}) : super(key: key);
 
   final List<Tab> _tabs = const <Tab>[
     Tab(text: "総合"),
