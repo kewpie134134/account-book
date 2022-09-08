@@ -1,10 +1,10 @@
+import 'package:account_book/entities/account_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-class InputFormPage extends ConsumerWidget {
+class InputFormPage extends StatelessWidget {
   InputFormPage({Key? key}) : super(key: key);
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -14,16 +14,19 @@ class InputFormPage extends ConsumerWidget {
     Tab(text: "収入"),
   ];
 
-  final Map<String, dynamic> _data = {
-    // モック用の仮データ
-    "id": 0,
-    "type": 0,
-    "detail": "",
-    "cost": 0
-  };
+  final AccountBookData _data = AccountBookData(
+    "",
+    IncomeSpendingType.spending.name,
+    "",
+    "",
+    "",
+    "",
+    0,
+    "",
+  );
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context, [bool mounted = true]) {
     return DefaultTabController(
       length: _tabs.length,
       child: Scaffold(
@@ -43,6 +46,7 @@ class InputFormPage extends ConsumerWidget {
                       tab.text!,
                       _formKey,
                       context,
+                      mounted,
                     ),
                   ],
                 ),
@@ -55,15 +59,19 @@ class InputFormPage extends ConsumerWidget {
   }
 
   Widget _createInputForm(
-      String tabText, GlobalKey<FormState> formKey, BuildContext context) {
+    String tabText,
+    GlobalKey<FormState> formKey,
+    BuildContext context,
+    bool mounted,
+  ) {
     switch (tabText) {
       case "支出":
         return Column(
-          children: [_createSpendingInputForm(formKey, context)],
+          children: [_createSpendingInputForm(formKey, context, mounted)],
         );
       case "収入":
         return Column(
-          children: [_createIncomeInputForm(formKey, context)],
+          children: [_createIncomeInputForm(formKey, context, mounted)],
         );
       default:
         return const Text("エラー");
@@ -71,9 +79,7 @@ class InputFormPage extends ConsumerWidget {
   }
 
   Widget _createSpendingInputForm(
-    GlobalKey<FormState> formKey,
-    BuildContext context,
-  ) {
+      GlobalKey<FormState> formKey, BuildContext context, bool mounted) {
     return SafeArea(
       child: Form(
         key: formKey,
@@ -87,7 +93,7 @@ class InputFormPage extends ConsumerWidget {
               _createPaymentTextField(), // セレクターにしたい
               _createMoneyTextField(),
               _createDetailTextField(),
-              _createSaveIconButton(formKey, context),
+              _createSaveIconButton(formKey, context, mounted),
             ],
           ),
         ),
@@ -96,9 +102,7 @@ class InputFormPage extends ConsumerWidget {
   }
 
   Widget _createIncomeInputForm(
-    GlobalKey<FormState> formKey,
-    BuildContext context,
-  ) {
+      GlobalKey<FormState> formKey, BuildContext context, bool mounted) {
     return SafeArea(
       child: Form(
         key: formKey,
@@ -107,10 +111,12 @@ class InputFormPage extends ConsumerWidget {
           child: Column(
             children: <Widget>[
               _createDateTextField(),
+              Container(),
               _createItemTextField(),
+              Container(),
               _createMoneyTextField(),
               _createDetailTextField(),
-              _createSaveIconButton(formKey, context),
+              _createSaveIconButton(formKey, context, mounted),
             ],
           ),
         ),
@@ -128,6 +134,7 @@ class InputFormPage extends ConsumerWidget {
       ),
       onSaved: (value) {
         // Save 処理が走った時に処理
+        _data.date = value.toString();
       },
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -149,6 +156,7 @@ class InputFormPage extends ConsumerWidget {
       ),
       onSaved: (value) {
         // Save 処理が走った時に処理
+        _data.store = value.toString();
       },
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -170,7 +178,7 @@ class InputFormPage extends ConsumerWidget {
       ),
       onSaved: (value) {
         // Save 処理が走った時に処理
-        _data["detail"] = value;
+        _data.item = value.toString();
       },
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -178,7 +186,7 @@ class InputFormPage extends ConsumerWidget {
         }
         return null;
       },
-      initialValue: _data["detail"].toString(),
+      initialValue: _data.detail,
     );
   }
 
@@ -192,6 +200,7 @@ class InputFormPage extends ConsumerWidget {
       ),
       onSaved: (value) {
         // Save 処理が走った時に処理
+        _data.payment = value.toString();
       },
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -213,7 +222,7 @@ class InputFormPage extends ConsumerWidget {
       ),
       onSaved: (value) {
         // Save 処理が走った時に処理
-        _data["cost"] = value is String ? int.parse(value) : value;
+        _data.amount = int.parse(value!);
       },
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -221,7 +230,7 @@ class InputFormPage extends ConsumerWidget {
         }
         return null;
       },
-      initialValue: _data["cost"].toString(),
+      initialValue: _data.amount.toString(),
     );
   }
 
@@ -235,6 +244,7 @@ class InputFormPage extends ConsumerWidget {
       ),
       onSaved: (value) {
         // Save が走った時に処理
+        _data.detail = value.toString();
       },
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -249,6 +259,7 @@ class InputFormPage extends ConsumerWidget {
   Widget _createSaveIconButton(
     GlobalKey<FormState> formKey,
     BuildContext context,
+    bool mounted,
   ) {
     return Padding(
       padding: const EdgeInsets.all(30),
@@ -258,15 +269,16 @@ class InputFormPage extends ConsumerWidget {
           // validate を実行
           if (formKey.currentState!.validate()) {
             final DateTime now = DateTime.now();
-            _data["date"] = DateFormat("yyyyMMddHHmmssSSS").format(now);
+            _data.doc = DateFormat("yyyyMMddHHmmssSSS").format(now);
             formKey.currentState?.save(); // Form の onSaved 関数を実行する
-            // Navigator.of(context).pop<dynamic>();
             await FirebaseFirestore.instance
                 .collection("users")
                 .doc("user1")
                 .collection("date")
-                .doc(_data["date"])
-                .set(_data);
+                .doc(_data.doc)
+                .set(_data.toMap());
+            if (!mounted) return;
+            Navigator.of(context).pop<dynamic>();
           }
         },
       ),
