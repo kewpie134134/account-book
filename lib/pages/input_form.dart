@@ -274,7 +274,7 @@ class InputFormPage extends StatelessWidget {
             await FirebaseFirestore.instance
                 .collection("users")
                 .doc("user1")
-                .collection("date")
+                .collection("datetime")
                 .doc(_data.doc)
                 .set(_data.toMap());
             if (!mounted) return;
