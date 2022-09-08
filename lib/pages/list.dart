@@ -1,6 +1,6 @@
 import 'package:account_book/components/drawer_menu.dart';
 import 'package:account_book/mocks/data.dart';
-import 'package:account_book/components/input_form.dart';
+import 'package:account_book/pages/input_form.dart';
 import 'package:flutter/material.dart';
 
 class ListPage extends StatelessWidget {
@@ -48,7 +48,7 @@ class ListPage extends StatelessWidget {
             Navigator.of(context).push<dynamic>(
               MaterialPageRoute(
                 builder: (context) {
-                  return InputForm();
+                  return InputFormPage();
                 },
               ),
             );

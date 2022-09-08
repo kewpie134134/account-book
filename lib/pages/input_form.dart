@@ -20,8 +20,8 @@ class InputFormState extends StateNotifier<RadioValue> {
 final inputFormProvider = StateNotifierProvider<InputFormState, RadioValue>(
     (ref) => InputFormState());
 
-class InputForm extends ConsumerWidget {
-  InputForm({Key? key}) : super(key: key);
+class InputFormPage extends ConsumerWidget {
+  InputFormPage({Key? key}) : super(key: key);
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final Map<String, dynamic> _data = {
