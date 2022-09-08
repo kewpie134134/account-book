@@ -1,27 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-enum RadioValue { spending, income }
-
-// riverpod と statenotifier を使用した状態管理方法
-class InputFormState extends StateNotifier<RadioValue> {
-  InputFormState({Key? key}) : super(RadioValue.income);
-
-  void changeState(value) {
-    state = value;
-  }
-
-  @override
-  get state;
-}
-
-// StateNotifierProvider で状態を発信する
-final inputFormProvider = StateNotifierProvider<InputFormState, RadioValue>(
-    (ref) => InputFormState());
-
 class InputFormPage extends ConsumerWidget {
   InputFormPage({Key? key}) : super(key: key);
+
+  final List<Tab> _tabs = const <Tab>[
+    Tab(text: "支出"),
+    Tab(text: "収入"),
+  ];
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final Map<String, dynamic> _data = {
@@ -34,21 +22,70 @@ class InputFormPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final groupValue = ref.watch(inputFormProvider);
-    final inputFormController = ref.read(inputFormProvider.notifier);
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("家計簿登録"),
+    return DefaultTabController(
+      length: _tabs.length,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("家計簿登録"),
+          bottom: TabBar(
+            tabs: _tabs,
+          ),
+        ),
+        body: TabBarView(
+          children: _tabs.map(
+            (Tab tab) {
+              return SingleChildScrollView(
+                child: Column(
+                  children: <Widget>[
+                    _createInputForm(
+                      tab.text!,
+                      _formKey,
+                      context,
+                    ),
+                  ],
+                ),
+              );
+            },
+          ).toList(),
+        ),
       ),
-      body: SafeArea(
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            padding: const EdgeInsets.all(20.0),
+    );
+  }
+
+  Widget _createInputForm(
+      String tabText, GlobalKey<FormState> formKey, BuildContext context) {
+    switch (tabText) {
+      case "支出":
+        return Column(
+          children: [_createSpendingInputForm(formKey, context)],
+        );
+      case "収入":
+        return Column(
+          children: [_createIncomeInputForm(formKey, context)],
+        );
+      default:
+        return const Text("エラー");
+    }
+  }
+
+  Widget _createSpendingInputForm(
+    GlobalKey<FormState> formKey,
+    BuildContext context,
+  ) {
+    return SafeArea(
+      child: Form(
+        key: formKey,
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
             children: <Widget>[
-              _createRadioListColumn(inputFormController, groupValue),
-              _createTextFieldColumn(),
-              _createSaveIconButton(inputFormController, context, _formKey),
+              _createDateTextField(),
+              _createStoreTextField(),
+              _createItemTextField(),
+              _createPaymentTextField(), // セレクターにしたい
+              _createMoneyTextField(),
+              _createDetailTextField(),
+              _createSaveIconButton(formKey, context),
             ],
           ),
         ),
@@ -56,46 +93,74 @@ class InputFormPage extends ConsumerWidget {
     );
   }
 
-  Widget _createRadioListColumn(
-      InputFormState inputFormController, RadioValue groupValue) {
-    return Padding(
-      padding: const EdgeInsets.all(0),
-      child: Column(
-        children: [
-          _createRadioList(inputFormController, groupValue, RadioValue.income),
-          _createRadioList(
-              inputFormController, groupValue, RadioValue.spending),
-        ],
+  Widget _createIncomeInputForm(
+    GlobalKey<FormState> formKey,
+    BuildContext context,
+  ) {
+    return SafeArea(
+      child: Form(
+        key: formKey,
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            children: <Widget>[
+              _createDateTextField(),
+              _createItemTextField(),
+              _createMoneyTextField(),
+              _createDetailTextField(),
+              _createSaveIconButton(formKey, context),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  Widget _createRadioList(InputFormState inputFormController,
-      RadioValue groupValue, RadioValue value) {
-    String text = value == RadioValue.spending ? "支出" : "収入";
-
-    return RadioListTile(
-      title: Text(text),
-      value: value,
-      groupValue: groupValue,
-      onChanged: (value) => _onRadioSelected(value, inputFormController),
+  Widget _createDateTextField() {
+    return TextFormField(
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      decoration: const InputDecoration(
+        icon: Icon(Icons.calendar_month),
+        hintText: "日付",
+        labelText: "Date",
+      ),
+      onSaved: (value) {
+        // Save 処理が走った時に処理
+      },
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return "項目は必須入力項目です";
+        }
+        return null;
+      },
+      initialValue: "",
     );
   }
 
-  Widget _createTextFieldColumn() {
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        children: [
-          _createItemTextField(),
-          _createMoneyTextField(),
-        ],
+  Widget _createStoreTextField() {
+    return TextFormField(
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      decoration: const InputDecoration(
+        icon: Icon(Icons.store),
+        hintText: "店舗",
+        labelText: "Store",
       ),
+      onSaved: (value) {
+        // Save 処理が走った時に処理
+      },
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return "項目は必須入力項目です";
+        }
+        return null;
+      },
+      initialValue: "",
     );
   }
 
   Widget _createItemTextField() {
     return TextFormField(
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       decoration: const InputDecoration(
         icon: Icon(Icons.library_books),
         hintText: "項目",
@@ -106,7 +171,7 @@ class InputFormPage extends ConsumerWidget {
         _data["detail"] = value;
       },
       validator: (value) {
-        if (value!.isEmpty) {
+        if (value == null || value.isEmpty) {
           return "項目は必須入力項目です";
         }
         return null;
@@ -115,8 +180,30 @@ class InputFormPage extends ConsumerWidget {
     );
   }
 
+  Widget _createPaymentTextField() {
+    return TextFormField(
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      decoration: const InputDecoration(
+        icon: Icon(Icons.payment),
+        hintText: "支払方法",
+        labelText: "Payment",
+      ),
+      onSaved: (value) {
+        // Save 処理が走った時に処理
+      },
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return "項目は必須入力項目です";
+        }
+        return null;
+      },
+      initialValue: "",
+    );
+  }
+
   Widget _createMoneyTextField() {
     return TextFormField(
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       decoration: const InputDecoration(
         icon: Icon(CupertinoIcons.money_dollar),
         hintText: "金額",
@@ -127,7 +214,7 @@ class InputFormPage extends ConsumerWidget {
         _data["cost"] = value is String ? int.parse(value) : value;
       },
       validator: (value) {
-        if (value!.isEmpty) {
+        if (value == null || value.isEmpty) {
           return "金額は必須入力項目です";
         }
         return null;
@@ -136,23 +223,49 @@ class InputFormPage extends ConsumerWidget {
     );
   }
 
-  Widget _createSaveIconButton(InputFormState inputFormController,
-      BuildContext context, GlobalKey<FormState> formKey) {
+  Widget _createDetailTextField() {
+    return TextFormField(
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      decoration: const InputDecoration(
+        icon: Icon(Icons.notes),
+        hintText: "詳細",
+        labelText: "Detail",
+      ),
+      onSaved: (value) {
+        // Save が走った時に処理
+      },
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return "項目は必須入力項目です";
+        }
+        return null;
+      },
+      initialValue: "",
+    );
+  }
+
+  Widget _createSaveIconButton(
+    GlobalKey<FormState> formKey,
+    BuildContext context,
+  ) {
     return Padding(
       padding: const EdgeInsets.all(30),
       child: ElevatedButton(
         child: const Text("登録"),
-        onPressed: () {
-          formKey.currentState?.save(); // Form の onSaved 関数を実行する
-          _data["type"] =
-              inputFormController.state == RadioValue.income ? 1 : 0;
-          Navigator.of(context).pop<dynamic>();
+        onPressed: () async {
+          if (formKey.currentState!.validate()) {
+            // validate を実行
+            formKey.currentState?.save(); // Form の onSaved 関数を実行する
+            // Navigator.of(context).pop<dynamic>();
+            await FirebaseFirestore.instance
+                .collection("users")
+                .doc("id_abc")
+                .collection("date")
+                .doc("0902")
+                .set(_data);
+          }
         },
       ),
     );
-  }
-
-  void _onRadioSelected(value, InputFormState inputFormController) {
-    inputFormController.changeState(value);
   }
 }
