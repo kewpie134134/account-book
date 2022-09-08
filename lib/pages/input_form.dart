@@ -143,7 +143,7 @@ class InputFormPage extends ConsumerWidget {
       child: ElevatedButton(
         child: const Text("登録"),
         onPressed: () {
-          formKey.currentState?.save();
+          formKey.currentState?.save(); // Form の onSaved 関数を実行する
           _data["type"] =
               inputFormController.state == RadioValue.income ? 1 : 0;
           Navigator.of(context).pop<dynamic>();

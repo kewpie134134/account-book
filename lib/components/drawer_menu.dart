@@ -41,19 +41,6 @@ class DrawerMenu extends StatelessWidget {
               );
             },
           ),
-          ListTile(
-            title: const Text("入力フォーム"),
-            onTap: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).push<dynamic>(
-                MaterialPageRoute(
-                  builder: (context) {
-                    return InputFormPage();
-                  },
-                ),
-              );
-            },
-          ),
         ],
       ),
     );

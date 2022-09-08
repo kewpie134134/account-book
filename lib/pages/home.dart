@@ -1,5 +1,6 @@
 import 'package:account_book/components/drawer_menu.dart';
 import 'package:account_book/components/indicator.dart';
+import 'package:account_book/pages/input_form.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -108,6 +109,18 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () {
+          Navigator.of(context).push<dynamic>(
+            MaterialPageRoute(
+              builder: (context) {
+                return InputFormPage();
+              },
+            ),
+          );
+        },
       ),
     );
   }
