@@ -1,5 +1,4 @@
 import 'package:account_book/entities/account_data.dart';
-import 'package:account_book/components/custom_date_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +16,9 @@ class InputFormPage extends StatelessWidget {
 
   final AccountBookData _data = AccountBookData(
       "", IncomeSpendingType.spending.name, "", "", "", "", 0, "");
+
+  // TextFormField で DatePicker を利用する
+  final TextEditingController textEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context, [bool mounted = true]) {
@@ -88,7 +90,7 @@ class InputFormPage extends StatelessWidget {
           padding: const EdgeInsets.all(20.0),
           child: Column(
             children: <Widget>[
-              _createDateTextField(),
+              _createDateTextField(context),
               isSpendingType ? _createStoreTextField() : Container(),
               _createItemTextField(),
               isSpendingType ? _createPaymentTextField() : Container(),
@@ -100,7 +102,6 @@ class InputFormPage extends StatelessWidget {
                 mounted,
                 type,
               ),
-              const CustomDatePicker(),
             ],
           ),
         ),
@@ -108,8 +109,9 @@ class InputFormPage extends StatelessWidget {
     );
   }
 
-  Widget _createDateTextField() {
+  Widget _createDateTextField(BuildContext context) {
     return TextFormField(
+      controller: textEditingController,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       decoration: const InputDecoration(
         icon: Icon(Icons.calendar_month),
@@ -120,13 +122,15 @@ class InputFormPage extends StatelessWidget {
         // Save 処理が走った時に処理
         _data.date = value.toString();
       },
+      onTap: () {
+        _getDate(context);
+      },
       validator: (value) {
         if (value == null || value.isEmpty) {
           return "項目は必須入力項目です";
         }
         return null;
       },
-      initialValue: _data.date,
     );
   }
 
@@ -148,7 +152,6 @@ class InputFormPage extends StatelessWidget {
         }
         return null;
       },
-      initialValue: _data.store,
     );
   }
 
@@ -170,7 +173,6 @@ class InputFormPage extends StatelessWidget {
         }
         return null;
       },
-      initialValue: _data.item,
     );
   }
 
@@ -192,7 +194,6 @@ class InputFormPage extends StatelessWidget {
         }
         return null;
       },
-      initialValue: _data.payment,
     );
   }
 
@@ -214,7 +215,6 @@ class InputFormPage extends StatelessWidget {
         }
         return null;
       },
-      initialValue: _data.amount.toString(),
     );
   }
 
@@ -236,7 +236,6 @@ class InputFormPage extends StatelessWidget {
         }
         return null;
       },
-      initialValue: _data.detail,
     );
   }
 
@@ -269,5 +268,21 @@ class InputFormPage extends StatelessWidget {
         },
       ),
     );
+  }
+
+  Future _getDate(BuildContext context) async {
+    final selectedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(DateTime.now().year - 3),
+      lastDate: DateTime(DateTime.now().year + 3),
+    );
+
+    if (selectedDate != null) {
+      textEditingController.text =
+          DateFormat("yyyy/MM/dd").format(selectedDate);
+    } else {
+      return;
+    }
   }
 }
