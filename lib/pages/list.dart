@@ -1,3 +1,4 @@
+import 'package:account_book/components/drawer_select_year.dart';
 import 'package:account_book/entities/account_data.dart';
 import 'package:account_book/pages/input_form.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -39,6 +40,7 @@ class ListPage extends StatelessWidget {
             initialIndex: 0, // 最初に表示するタブ
             length: _tabs.length, // タブの数
             child: Scaffold(
+              drawer: const DrawerSelectYear(),
               appBar: AppBar(
                 title: const Text("家計簿一覧"),
                 bottom: const TabBar(
@@ -99,53 +101,6 @@ class ListPage extends StatelessWidget {
         ],
       ),
     );
-
-    // switch (tabText) {
-    //   case "総合":
-    //     tabType = "total";
-    //     return Container(
-    //       padding: const EdgeInsets.only(top: 48),
-    //       child: Column(
-    //         mainAxisSize: MainAxisSize.max,
-    //         children: [
-    //           _createViewHeader(),
-    //           Column(
-    //             children: _createWordCards(tabType, documents),
-    //           ),
-    //         ],
-    //       ),
-    //     );
-    //   case "収入":
-    //     tabType = IncomeSpendingType.income.name;
-    //     return Container(
-    //       padding: const EdgeInsets.only(top: 48),
-    //       child: Column(
-    //         mainAxisSize: MainAxisSize.max,
-    //         children: [
-    //           _createViewHeader(),
-    //           Column(
-    //             children: _createWordCards(tabType, documents),
-    //           ),
-    //         ],
-    //       ),
-    //     );
-    //   case "支出":
-    //     tabType = IncomeSpendingType.spending.name;
-    //     return Container(
-    //       padding: const EdgeInsets.only(top: 48),
-    //       child: Column(
-    //         mainAxisSize: MainAxisSize.max,
-    //         children: [
-    //           _createViewHeader(),
-    //           Column(
-    //             children: _createWordCards(tabType, documents),
-    //           ),
-    //         ],
-    //       ),
-    //     );
-    //   default:
-    //     return const Text("エラー");
-    // }
   }
 
   Widget _createViewHeader() {

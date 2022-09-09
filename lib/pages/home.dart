@@ -1,4 +1,4 @@
-import 'package:account_book/components/drawer_menu.dart';
+import 'package:account_book/components/drawer_select_year.dart';
 import 'package:account_book/components/indicator.dart';
 import 'package:account_book/pages/input_form.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -23,6 +23,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const DrawerSelectYear(),
       appBar: AppBar(
         title: const Text("収入支出"),
       ),
