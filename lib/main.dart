@@ -1,5 +1,6 @@
 import 'package:account_book/config/config.dart';
 import 'package:account_book/pages/home.dart';
+import 'package:account_book/pages/list.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -40,7 +41,9 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         fontFamily: "NotoSansJP",
       ),
-      home: const HomePage(),
+      // home: const HomePage(),
+      home: const ListPage(),
+      // DatePicker を日本語表示にする設定
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,

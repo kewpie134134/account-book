@@ -31,7 +31,7 @@ class ListPage extends StatelessWidget {
             length: _tabs.length,
             child: Scaffold(
               appBar: AppBar(
-                title: const Text("家計簿一覧(FB)"),
+                title: const Text("家計簿一覧"),
                 bottom: const TabBar(
                   tabs: _tabs,
                 ),
@@ -70,7 +70,7 @@ class ListPage extends StatelessWidget {
         } else if (snapshot.hasError) {
           return const Text("情報取得に失敗しました。");
         } else {
-          return const Text("予期せぬエラーが発生しました。再読み込みを試してください。");
+          return const Center(child: CircularProgressIndicator());
         }
       },
     );
@@ -83,55 +83,200 @@ class ListPage extends StatelessWidget {
     switch (tabText) {
       case "総合":
         tabType = "total";
-        return Column(
-          children: _createWordCards(tabType, documents),
+        return Container(
+          padding: const EdgeInsets.only(top: 48),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              _createViewHeader(),
+              Column(
+                children: _createWordCards(tabType, documents),
+              ),
+            ],
+          ),
         );
       case "収入":
         tabType = IncomeSpendingType.income.name;
-        return Column(
-          children: _createWordCards(tabType, documents),
+        return Container(
+          padding: const EdgeInsets.only(top: 48),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              _createViewHeader(),
+              Column(
+                children: _createWordCards(tabType, documents),
+              ),
+            ],
+          ),
         );
       case "支出":
         tabType = IncomeSpendingType.spending.name;
-        return Column(
-          children: _createWordCards(tabType, documents),
+        return Container(
+          padding: const EdgeInsets.only(top: 48),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              _createViewHeader(),
+              Column(
+                children: _createWordCards(tabType, documents),
+              ),
+            ],
+          ),
         );
       default:
         return const Text("エラー");
     }
   }
 
+  Widget _createViewHeader() {
+    return Row(
+      children: [
+        Expanded(
+          flex: 1,
+          child: ListTile(
+            leading: ClipOval(
+              child: Container(
+                color: Colors.grey[300],
+                width: 48,
+                height: 48,
+                child: Icon(
+                  Icons.storage,
+                  color: Colors.grey[800],
+                ),
+              ),
+            ),
+            title: const Text('Posts'),
+            subtitle: const Text('20 Posts'),
+          ),
+        ),
+        Expanded(
+          flex: 1,
+          child: ListTile(
+            leading: ClipOval(
+              child: Container(
+                color: Colors.grey[300],
+                width: 48,
+                height: 48,
+                child: Icon(
+                  Icons.style,
+                  color: Colors.grey[800],
+                ),
+              ),
+            ),
+            title: const Text('All Types'),
+            subtitle: const Text(''),
+          ),
+        ),
+      ],
+    );
+  }
+
   List<Widget> _createWordCards(
-      String tabType, List<DocumentSnapshot> documents) {
+    String tabType,
+    List<DocumentSnapshot> documents,
+  ) {
     return documents.map(
       (document) {
         if (document["type"] == tabType || tabType == "total") {
+          const colorPrimary = Colors.black12;
+          const colorNegative = Colors.blueAccent;
+          const colorPositive = Colors.greenAccent;
+          final isSpendingTypeString =
+              document["type"] == IncomeSpendingType.spending.name;
+          Icon icon = isSpendingTypeString
+              ? const Icon(
+                  Icons.subdirectory_arrow_left_outlined,
+                  color: Colors.pink,
+                )
+              : const Icon(
+                  Icons.add_box,
+                  color: Colors.blue,
+                );
+
           return Card(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: _createWordTile(tabType, document),
+            elevation: 8,
+            shadowColor: Colors.grey,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
+              children: [
+                ListTile(
+                  leading: ClipOval(
+                    child: Container(
+                      color: colorPrimary,
+                      width: 48,
+                      height: 48,
+                      child: Center(child: icon),
+                    ),
+                  ),
+                  title: Text(document["item"]),
+                  subtitle: Text(document["date"]),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(width: 72),
+                      Container(
+                        width: 16,
+                        height: 16,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: colorPrimary, width: 4),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Flexible(child: Text(document["detail"])),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    children: [
+                      Container(
+                        decoration: const BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(color: colorPrimary, width: 2),
+                          ),
+                        ),
+                        child: Text(
+                          document["detail"],
+                          style: const TextStyle(color: Colors.blueAccent),
+                        ),
+                      ),
+                      const SizedBox(width: 24),
+                      Expanded(
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+                            foregroundColor: colorNegative,
+                          ),
+                          onPressed: () {},
+                          child: Text(document["detail"]),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                          child: TextButton(
+                        style: TextButton.styleFrom(
+                          foregroundColor: colorPositive,
+                          backgroundColor: colorPositive.withOpacity(0.2),
+                        ),
+                        onPressed: () {},
+                        child: Text(document["detail"]),
+                      ))
+                    ],
+                  ),
+                ),
+              ],
             ),
           );
         }
         return Container();
       },
     ).toList();
-  }
-
-  Widget _createWordTile(String tabType, DocumentSnapshot document) {
-    Icon icon = document["type"] == IncomeSpendingType.spending.name
-        ? const Icon(
-            Icons.subdirectory_arrow_left_outlined,
-            color: Colors.pink,
-          )
-        : const Icon(
-            Icons.add_box,
-            color: Colors.blue,
-          );
-    return ListTile(
-      leading: icon,
-      title: Text(document["item"]),
-      subtitle: Text(document["detail"]),
-    );
   }
 }
