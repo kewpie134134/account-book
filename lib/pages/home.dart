@@ -26,7 +26,6 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text("収入支出"),
       ),
-      drawer: const DrawerMenu(),
       body: AspectRatio(
         aspectRatio: 1.3,
         child: Card(

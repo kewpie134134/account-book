@@ -40,6 +40,19 @@ class DrawerMenu extends StatelessWidget {
               );
             },
           ),
+          ListTile(
+            title: const Text("家計簿一覧"),
+            onTap: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).push<dynamic>(
+                MaterialPageRoute(
+                  builder: (context) {
+                    return const ListPage();
+                  },
+                ),
+              );
+            },
+          ),
         ],
       ),
     );

@@ -1,13 +1,21 @@
-import 'package:account_book/components/drawer_menu.dart';
 import 'package:account_book/entities/account_data.dart';
 import 'package:account_book/pages/input_form.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 const List<Tab> _tabs = <Tab>[
-  Tab(text: "総合"),
-  Tab(text: "収入"),
-  Tab(text: "支出"),
+  Tab(text: "1月"),
+  Tab(text: "2月"),
+  Tab(text: "3月"),
+  Tab(text: "4月"),
+  Tab(text: "5月"),
+  Tab(text: "6月"),
+  Tab(text: "7月"),
+  Tab(text: "8月"),
+  Tab(text: "9月"),
+  Tab(text: "10月"),
+  Tab(text: "11月"),
+  Tab(text: "12月"),
 ];
 
 class ListPage extends StatelessWidget {
@@ -28,15 +36,16 @@ class ListPage extends StatelessWidget {
           // List<DocumentSnapshot> を snapshot から取り出す
           final List<DocumentSnapshot> documents = snapshot.data!.docs;
           return DefaultTabController(
-            length: _tabs.length,
+            initialIndex: 0, // 最初に表示するタブ
+            length: _tabs.length, // タブの数
             child: Scaffold(
               appBar: AppBar(
                 title: const Text("家計簿一覧"),
                 bottom: const TabBar(
+                  isScrollable: true, // スクロールを有効
                   tabs: _tabs,
                 ),
               ),
-              drawer: const DrawerMenu(),
               body: TabBarView(
                 children: _tabs.map(
                   (Tab tab) {
@@ -78,54 +87,65 @@ class ListPage extends StatelessWidget {
 
   Widget _createHouseholdAccountBookDetail(
       String tabText, List<DocumentSnapshot> documents) {
-    String tabType = "total";
+    return Container(
+      padding: const EdgeInsets.only(top: 48),
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          _createViewHeader(),
+          Column(
+            children: _createWordCards(documents),
+          ),
+        ],
+      ),
+    );
 
-    switch (tabText) {
-      case "総合":
-        tabType = "total";
-        return Container(
-          padding: const EdgeInsets.only(top: 48),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              _createViewHeader(),
-              Column(
-                children: _createWordCards(tabType, documents),
-              ),
-            ],
-          ),
-        );
-      case "収入":
-        tabType = IncomeSpendingType.income.name;
-        return Container(
-          padding: const EdgeInsets.only(top: 48),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              _createViewHeader(),
-              Column(
-                children: _createWordCards(tabType, documents),
-              ),
-            ],
-          ),
-        );
-      case "支出":
-        tabType = IncomeSpendingType.spending.name;
-        return Container(
-          padding: const EdgeInsets.only(top: 48),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              _createViewHeader(),
-              Column(
-                children: _createWordCards(tabType, documents),
-              ),
-            ],
-          ),
-        );
-      default:
-        return const Text("エラー");
-    }
+    // switch (tabText) {
+    //   case "総合":
+    //     tabType = "total";
+    //     return Container(
+    //       padding: const EdgeInsets.only(top: 48),
+    //       child: Column(
+    //         mainAxisSize: MainAxisSize.max,
+    //         children: [
+    //           _createViewHeader(),
+    //           Column(
+    //             children: _createWordCards(tabType, documents),
+    //           ),
+    //         ],
+    //       ),
+    //     );
+    //   case "収入":
+    //     tabType = IncomeSpendingType.income.name;
+    //     return Container(
+    //       padding: const EdgeInsets.only(top: 48),
+    //       child: Column(
+    //         mainAxisSize: MainAxisSize.max,
+    //         children: [
+    //           _createViewHeader(),
+    //           Column(
+    //             children: _createWordCards(tabType, documents),
+    //           ),
+    //         ],
+    //       ),
+    //     );
+    //   case "支出":
+    //     tabType = IncomeSpendingType.spending.name;
+    //     return Container(
+    //       padding: const EdgeInsets.only(top: 48),
+    //       child: Column(
+    //         mainAxisSize: MainAxisSize.max,
+    //         children: [
+    //           _createViewHeader(),
+    //           Column(
+    //             children: _createWordCards(tabType, documents),
+    //           ),
+    //         ],
+    //       ),
+    //     );
+    //   default:
+    //     return const Text("エラー");
+    // }
   }
 
   Widget _createViewHeader() {
@@ -172,110 +192,106 @@ class ListPage extends StatelessWidget {
   }
 
   List<Widget> _createWordCards(
-    String tabType,
     List<DocumentSnapshot> documents,
   ) {
     return documents.map(
       (document) {
-        if (document["type"] == tabType || tabType == "total") {
-          const colorPrimary = Colors.black12;
-          const colorNegative = Colors.blueAccent;
-          const colorPositive = Colors.greenAccent;
-          final isSpendingTypeString =
-              document["type"] == IncomeSpendingType.spending.name;
-          Icon icon = isSpendingTypeString
-              ? const Icon(
-                  Icons.subdirectory_arrow_left_outlined,
-                  color: Colors.pink,
-                )
-              : const Icon(
-                  Icons.add_box,
-                  color: Colors.blue,
-                );
+        const colorPrimary = Colors.black12;
+        const colorNegative = Colors.blueAccent;
+        const colorPositive = Colors.greenAccent;
+        final isSpendingTypeString =
+            document["type"] == IncomeSpendingType.spending.name;
+        Icon icon = isSpendingTypeString
+            ? const Icon(
+                Icons.subdirectory_arrow_left_outlined,
+                color: Colors.pink,
+              )
+            : const Icon(
+                Icons.add_box,
+                color: Colors.blue,
+              );
 
-          return Card(
-            elevation: 8,
-            shadowColor: Colors.grey,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(
-              children: [
-                ListTile(
-                  leading: ClipOval(
-                    child: Container(
-                      color: colorPrimary,
-                      width: 48,
-                      height: 48,
-                      child: Center(child: icon),
+        return Card(
+          elevation: 8,
+          shadowColor: Colors.grey,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            children: [
+              ListTile(
+                leading: ClipOval(
+                  child: Container(
+                    color: colorPrimary,
+                    width: 48,
+                    height: 48,
+                    child: Center(child: icon),
+                  ),
+                ),
+                title: Text(document["item"]),
+                subtitle: Text(document["date"]),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(width: 72),
+                    Container(
+                      width: 16,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: colorPrimary, width: 4),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
-                  ),
-                  title: Text(document["item"]),
-                  subtitle: Text(document["date"]),
+                    const SizedBox(width: 8),
+                    Flexible(child: Text(document["detail"])),
+                  ],
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(width: 72),
-                      Container(
-                        width: 16,
-                        height: 16,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: colorPrimary, width: 4),
-                          borderRadius: BorderRadius.circular(8),
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  children: [
+                    Container(
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(color: colorPrimary, width: 2),
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Flexible(child: Text(document["detail"])),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Row(
-                    children: [
-                      Container(
-                        decoration: const BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(color: colorPrimary, width: 2),
-                          ),
-                        ),
-                        child: Text(
-                          document["detail"],
-                          style: const TextStyle(color: Colors.blueAccent),
-                        ),
+                      child: Text(
+                        document["detail"],
+                        style: const TextStyle(color: Colors.blueAccent),
                       ),
-                      const SizedBox(width: 24),
-                      Expanded(
-                        child: TextButton(
-                          style: TextButton.styleFrom(
-                            foregroundColor: colorNegative,
-                          ),
-                          onPressed: () {},
-                          child: Text(document["detail"]),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                          child: TextButton(
+                    ),
+                    const SizedBox(width: 24),
+                    Expanded(
+                      child: TextButton(
                         style: TextButton.styleFrom(
-                          foregroundColor: colorPositive,
-                          backgroundColor: colorPositive.withOpacity(0.2),
+                          foregroundColor: colorNegative,
                         ),
                         onPressed: () {},
                         child: Text(document["detail"]),
-                      ))
-                    ],
-                  ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                        child: TextButton(
+                      style: TextButton.styleFrom(
+                        foregroundColor: colorPositive,
+                        backgroundColor: colorPositive.withOpacity(0.2),
+                      ),
+                      onPressed: () {},
+                      child: Text(document["detail"]),
+                    ))
+                  ],
                 ),
-              ],
-            ),
-          );
-        }
-        return Container();
+              ),
+            ],
+          ),
+        );
       },
     ).toList();
   }
