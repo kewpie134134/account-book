@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class CustomDatePicker extends StatefulWidget {
   const CustomDatePicker({Key? key}) : super(key: key);
@@ -27,7 +28,9 @@ class _ChangeFormState extends State<CustomDatePicker> {
         padding: const EdgeInsets.all(0.0),
         child: Column(
           children: <Widget>[
-            Center(child: Text("$_date")),
+            Center(
+              child: Text(DateFormat("yyyy/MM/dd").format(_date)),
+            ),
             ElevatedButton(
               onPressed: () => _selectDate(context),
               child: const Text('日付選択'),
