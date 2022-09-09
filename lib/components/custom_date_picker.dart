@@ -12,6 +12,7 @@ class _ChangeFormState extends State<CustomDatePicker> {
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
+      locale: const Locale("ja"),
       context: context,
       initialDate: _date,
       firstDate: DateTime(2000),
