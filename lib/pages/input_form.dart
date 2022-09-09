@@ -1,4 +1,5 @@
 import 'package:account_book/entities/account_data.dart';
+import 'package:account_book/components/custom_date_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -99,6 +100,7 @@ class InputFormPage extends StatelessWidget {
                 mounted,
                 type,
               ),
+              const CustomDatePicker(),
             ],
           ),
         ),

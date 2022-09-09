@@ -3,6 +3,7 @@ import 'package:account_book/pages/home.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 // Firebase のシークレット情報を取得
 final Configurations configurations = Configurations();
@@ -40,6 +41,14 @@ class MyApp extends StatelessWidget {
         fontFamily: "NotoSansJP",
       ),
       home: const HomePage(),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale("en"),
+        Locale("ja"),
+      ],
     );
   }
 }
