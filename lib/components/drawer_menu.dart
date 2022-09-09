@@ -1,5 +1,5 @@
-import 'package:account_book/pages/household_account_book_detail.dart';
-import 'package:account_book/pages/household_account_book_list.dart';
+import 'package:account_book/pages/home.dart';
+import 'package:account_book/pages/list.dart';
 import 'package:flutter/material.dart';
 
 class DrawerMenu extends StatelessWidget {
@@ -17,10 +17,11 @@ class DrawerMenu extends StatelessWidget {
           ListTile(
             title: const Text("収入支出"),
             onTap: () {
+              Navigator.of(context).pop();
               Navigator.of(context).push<dynamic>(
                 MaterialPageRoute(
                   builder: (context) {
-                    return const HouseholdAccountBookDetail();
+                    return const HomePage();
                   },
                 ),
               );
@@ -29,10 +30,11 @@ class DrawerMenu extends StatelessWidget {
           ListTile(
             title: const Text("家計簿一覧"),
             onTap: () {
+              Navigator.of(context).pop();
               Navigator.of(context).push<dynamic>(
                 MaterialPageRoute(
                   builder: (context) {
-                    return const HouseholdAccountBookList();
+                    return const ListPage();
                   },
                 ),
               );
