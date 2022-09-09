@@ -15,15 +15,7 @@ class InputFormPage extends StatelessWidget {
   ];
 
   final AccountBookData _data = AccountBookData(
-    "",
-    IncomeSpendingType.spending.name,
-    "",
-    "",
-    "",
-    "",
-    0,
-    "",
-  );
+      "", IncomeSpendingType.spending.name, "", "", "", "", 0, "");
 
   @override
   Widget build(BuildContext context, [bool mounted = true]) {
@@ -67,47 +59,27 @@ class InputFormPage extends StatelessWidget {
     switch (tabText) {
       case "支出":
         return Column(
-          children: [_createSpendingInputForm(formKey, context, mounted)],
+          children: [
+            _createInputFormArea(
+                formKey, context, mounted, IncomeSpendingType.spending)
+          ],
         );
       case "収入":
         return Column(
-          children: [_createIncomeInputForm(formKey, context, mounted)],
+          children: [
+            _createInputFormArea(
+                formKey, context, mounted, IncomeSpendingType.income)
+          ],
         );
       default:
         return const Text("エラー");
     }
   }
 
-  Widget _createSpendingInputForm(
-      GlobalKey<FormState> formKey, BuildContext context, bool mounted) {
-    return SafeArea(
-      child: Form(
-        key: formKey,
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            children: <Widget>[
-              _createDateTextField(),
-              _createStoreTextField(),
-              _createItemTextField(),
-              _createPaymentTextField(), // セレクターにしたい
-              _createMoneyTextField(),
-              _createDetailTextField(),
-              _createSaveIconButton(
-                formKey,
-                context,
-                mounted,
-                IncomeSpendingType.spending,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  Widget _createInputFormArea(GlobalKey<FormState> formKey,
+      BuildContext context, bool mounted, IncomeSpendingType type) {
+    final isSpendingType = type == IncomeSpendingType.spending;
 
-  Widget _createIncomeInputForm(
-      GlobalKey<FormState> formKey, BuildContext context, bool mounted) {
     return SafeArea(
       child: Form(
         key: formKey,
@@ -116,16 +88,16 @@ class InputFormPage extends StatelessWidget {
           child: Column(
             children: <Widget>[
               _createDateTextField(),
-              Container(),
+              isSpendingType ? _createStoreTextField() : Container(),
               _createItemTextField(),
-              Container(),
+              isSpendingType ? _createPaymentTextField() : Container(),
               _createMoneyTextField(),
               _createDetailTextField(),
               _createSaveIconButton(
                 formKey,
                 context,
                 mounted,
-                IncomeSpendingType.income,
+                type,
               ),
             ],
           ),
@@ -152,7 +124,7 @@ class InputFormPage extends StatelessWidget {
         }
         return null;
       },
-      initialValue: "",
+      initialValue: _data.date,
     );
   }
 
@@ -174,7 +146,7 @@ class InputFormPage extends StatelessWidget {
         }
         return null;
       },
-      initialValue: "",
+      initialValue: _data.store,
     );
   }
 
@@ -196,7 +168,7 @@ class InputFormPage extends StatelessWidget {
         }
         return null;
       },
-      initialValue: _data.detail,
+      initialValue: _data.item,
     );
   }
 
@@ -218,7 +190,7 @@ class InputFormPage extends StatelessWidget {
         }
         return null;
       },
-      initialValue: "",
+      initialValue: _data.payment,
     );
   }
 
@@ -262,7 +234,7 @@ class InputFormPage extends StatelessWidget {
         }
         return null;
       },
-      initialValue: "",
+      initialValue: _data.detail,
     );
   }
 

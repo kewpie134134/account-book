@@ -1,6 +1,7 @@
 import 'package:account_book/components/drawer_menu.dart';
-import 'package:account_book/mocks/data.dart';
+import 'package:account_book/entities/account_data.dart';
 import 'package:account_book/pages/input_form.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 const List<Tab> _tabs = <Tab>[
@@ -14,83 +15,101 @@ class ListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List householdAccountBookList = getHouseholdAccountDataList();
-
-    return DefaultTabController(
-      length: _tabs.length,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("家計簿一覧"),
-          bottom: const TabBar(
-            tabs: _tabs,
-          ),
-        ),
-        drawer: const DrawerMenu(),
-        body: TabBarView(
-          children: _tabs.map(
-            (Tab tab) {
-              return SingleChildScrollView(
-                child: Column(
-                  children: <Widget>[
-                    _createHouseholdAccountBookDetail(
-                      tab.text!,
-                      householdAccountBookList,
-                    ),
-                  ],
+    // StreamBuilder を使って、データ更新を自動で行う
+    return StreamBuilder<QuerySnapshot>(
+      // stream に Stream<QuerySnapshot> を渡す
+      stream: FirebaseFirestore.instance
+          .collection("users")
+          .doc("user1")
+          .collection("datetime")
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          // List<DocumentSnapshot> を snapshot から取り出す
+          final List<DocumentSnapshot> documents = snapshot.data!.docs;
+          return DefaultTabController(
+            length: _tabs.length,
+            child: Scaffold(
+              appBar: AppBar(
+                title: const Text("家計簿一覧(FB)"),
+                bottom: const TabBar(
+                  tabs: _tabs,
                 ),
-              );
-            },
-          ).toList(),
-        ),
-        floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.add),
-          onPressed: () {
-            Navigator.of(context).push<dynamic>(
-              MaterialPageRoute(
-                builder: (context) {
-                  return InputFormPage();
+              ),
+              drawer: const DrawerMenu(),
+              body: TabBarView(
+                children: _tabs.map(
+                  (Tab tab) {
+                    return SingleChildScrollView(
+                      child: Column(
+                        children: <Widget>[
+                          _createHouseholdAccountBookDetail(
+                            tab.text!,
+                            documents,
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ).toList(),
+              ),
+              floatingActionButton: FloatingActionButton(
+                child: const Icon(Icons.add),
+                onPressed: () {
+                  Navigator.of(context).push<dynamic>(
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return InputFormPage();
+                      },
+                    ),
+                  );
                 },
               ),
-            );
-          },
-        ),
-      ),
+            ),
+          );
+        } else if (snapshot.hasError) {
+          return const Text("情報取得に失敗しました。");
+        } else {
+          return const Text("予期せぬエラーが発生しました。再読み込みを試してください。");
+        }
+      },
     );
   }
 
   Widget _createHouseholdAccountBookDetail(
-      String tabText, List householdAccountDataList) {
-    int tabType = 3;
+      String tabText, List<DocumentSnapshot> documents) {
+    String tabType = "total";
 
     switch (tabText) {
       case "総合":
-        tabType = 3;
+        tabType = "total";
         return Column(
-          children: _createWordCards(tabType, householdAccountDataList),
+          children: _createWordCards(tabType, documents),
         );
       case "収入":
-        tabType = 1;
+        tabType = IncomeSpendingType.income.name;
         return Column(
-          children: _createWordCards(tabType, householdAccountDataList),
+          children: _createWordCards(tabType, documents),
         );
       case "支出":
-        tabType = 0;
+        tabType = IncomeSpendingType.spending.name;
         return Column(
-          children: _createWordCards(tabType, householdAccountDataList),
+          children: _createWordCards(tabType, documents),
         );
       default:
         return const Text("エラー");
     }
   }
 
-  List<Widget> _createWordCards(int tabType, List householdAccountDataList) {
-    return householdAccountDataList.map(
-      (householdAccountData) {
-        if (householdAccountData["type"] == tabType || tabType == 3) {
+  List<Widget> _createWordCards(
+      String tabType, List<DocumentSnapshot> documents) {
+    return documents.map(
+      (document) {
+        if (document["type"] == tabType || tabType == "total") {
           return Card(
             child: Padding(
               padding: const EdgeInsets.all(20),
-              child: _createWordTile(householdAccountData, tabType),
+              child: _createWordTile(tabType, document),
             ),
           );
         }
@@ -99,8 +118,8 @@ class ListPage extends StatelessWidget {
     ).toList();
   }
 
-  Widget _createWordTile(householdAccountData, int tabType) {
-    Icon icon = householdAccountData["type"] == 0
+  Widget _createWordTile(String tabType, DocumentSnapshot document) {
+    Icon icon = document["type"] == IncomeSpendingType.spending.name
         ? const Icon(
             Icons.subdirectory_arrow_left_outlined,
             color: Colors.pink,
@@ -111,24 +130,8 @@ class ListPage extends StatelessWidget {
           );
     return ListTile(
       leading: icon,
-      title: Text(householdAccountData["detail"]),
-      subtitle: Text("${householdAccountData["cost"]}円"),
+      title: Text(document["item"]),
+      subtitle: Text(document["detail"]),
     );
   }
-}
-
-/// モックデータ
-List getHouseholdAccountDataList() {
-  List householdAccountData = [];
-  var tData = data["data"] as dynamic;
-  tData.forEach((var item) {
-    int id = int.parse(item['id']);
-    int type = int.parse(item['type']);
-    String detail = item['detail'];
-    int cost = int.parse(item['cost']);
-
-    householdAccountData
-        .add({"id": id, "type": type, "detail": detail, "cost": cost});
-  });
-  return householdAccountData;
 }
