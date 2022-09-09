@@ -1,4 +1,5 @@
 import 'package:account_book/components/drawer_menu.dart';
+import 'package:account_book/entities/account_data.dart';
 import 'package:account_book/pages/input_form.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -77,21 +78,21 @@ class ListPage2 extends StatelessWidget {
 
   Widget _createHouseholdAccountBookDetail(
       String tabText, List<DocumentSnapshot> documents) {
-    int tabType = 3;
+    String tabType = "total";
 
     switch (tabText) {
       case "総合":
-        tabType = 3;
+        tabType = "total";
         return Column(
           children: _createWordCards(tabType, documents),
         );
       case "収入":
-        tabType = 1;
+        tabType = IncomeSpendingType.income.name;
         return Column(
           children: _createWordCards(tabType, documents),
         );
       case "支出":
-        tabType = 0;
+        tabType = IncomeSpendingType.spending.name;
         return Column(
           children: _createWordCards(tabType, documents),
         );
@@ -100,10 +101,11 @@ class ListPage2 extends StatelessWidget {
     }
   }
 
-  List<Widget> _createWordCards(int tabType, List<DocumentSnapshot> documents) {
+  List<Widget> _createWordCards(
+      String tabType, List<DocumentSnapshot> documents) {
     return documents.map(
       (document) {
-        if (document["type"] == tabType || tabType == 3) {
+        if (document["type"] == tabType || tabType == "total") {
           return Card(
             child: Padding(
               padding: const EdgeInsets.all(20),
@@ -116,20 +118,20 @@ class ListPage2 extends StatelessWidget {
     ).toList();
   }
 
-  Widget _createWordTile(int tabType, DocumentSnapshot document) {
-    // Icon icon = householdAccountData["type"] == 0
-    //     ? const Icon(
-    //         Icons.subdirectory_arrow_left_outlined,
-    //         color: Colors.pink,
-    //       )
-    //     : const Icon(
-    //         Icons.add_box,
-    //         color: Colors.blue,
-    //       );
-    return const ListTile(
-      leading: Icon(Icons.add),
-      title: Text("タイトル"),
-      subtitle: Text("サブタイトル"),
+  Widget _createWordTile(String tabType, DocumentSnapshot document) {
+    Icon icon = document["type"] == IncomeSpendingType.spending.name
+        ? const Icon(
+            Icons.subdirectory_arrow_left_outlined,
+            color: Colors.pink,
+          )
+        : const Icon(
+            Icons.add_box,
+            color: Colors.blue,
+          );
+    return ListTile(
+      leading: icon,
+      title: Text(document["item"]),
+      subtitle: Text(document["detail"]),
     );
   }
 }

@@ -93,7 +93,12 @@ class InputFormPage extends StatelessWidget {
               _createPaymentTextField(), // セレクターにしたい
               _createMoneyTextField(),
               _createDetailTextField(),
-              _createSaveIconButton(formKey, context, mounted),
+              _createSaveIconButton(
+                formKey,
+                context,
+                mounted,
+                IncomeSpendingType.spending,
+              ),
             ],
           ),
         ),
@@ -116,7 +121,12 @@ class InputFormPage extends StatelessWidget {
               Container(),
               _createMoneyTextField(),
               _createDetailTextField(),
-              _createSaveIconButton(formKey, context, mounted),
+              _createSaveIconButton(
+                formKey,
+                context,
+                mounted,
+                IncomeSpendingType.income,
+              ),
             ],
           ),
         ),
@@ -260,6 +270,7 @@ class InputFormPage extends StatelessWidget {
     GlobalKey<FormState> formKey,
     BuildContext context,
     bool mounted,
+    IncomeSpendingType type,
   ) {
     return Padding(
       padding: const EdgeInsets.all(30),
@@ -270,6 +281,7 @@ class InputFormPage extends StatelessWidget {
           if (formKey.currentState!.validate()) {
             final DateTime now = DateTime.now();
             _data.doc = DateFormat("yyyyMMddHHmmssSSS").format(now);
+            _data.type = type.name;
             formKey.currentState?.save(); // Form の onSaved 関数を実行する
             await FirebaseFirestore.instance
                 .collection("users")
