@@ -1,4 +1,4 @@
-import 'package:account_book/components/half_length.dart';
+import 'package:account_book/utils/half_length.dart';
 import 'package:account_book/entities/account_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
