@@ -116,7 +116,7 @@ class _HomePageState extends State<HomePage> {
           Navigator.of(context).push<dynamic>(
             MaterialPageRoute(
               builder: (context) {
-                return InputFormPage();
+                return const InputFormPage();
               },
             ),
           );

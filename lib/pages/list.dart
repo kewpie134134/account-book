@@ -70,7 +70,7 @@ class ListPage extends StatelessWidget {
                   Navigator.of(context).push<dynamic>(
                     MaterialPageRoute(
                       builder: (context) {
-                        return InputFormPage();
+                        return const InputFormPage();
                       },
                     ),
                   );

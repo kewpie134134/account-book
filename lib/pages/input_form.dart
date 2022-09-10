@@ -1,17 +1,39 @@
+import 'package:account_book/components/half_length.dart';
 import 'package:account_book/entities/account_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class InputFormPage extends StatelessWidget {
-  InputFormPage({Key? key}) : super(key: key);
+class InputFormPage extends StatefulWidget {
+  const InputFormPage({Key? key}) : super(key: key);
 
+  @override
+  State<InputFormPage> createState() => _InputFormPageState();
+}
+
+class _InputFormPageState extends State<InputFormPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final List<Tab> _tabs = const <Tab>[
     Tab(text: "支出"),
     Tab(text: "収入"),
+  ];
+
+  // FireStore からデータを取得したい
+  final List<DropdownMenuItem<String>> _dropdownMenuItems = const [
+    DropdownMenuItem(
+      value: 'aaa',
+      child: Text('aaa'),
+    ),
+    DropdownMenuItem(
+      value: 'bbb',
+      child: Text('bbb'),
+    ),
+    DropdownMenuItem(
+      value: 'ccc',
+      child: Text('ccc'),
+    ),
   ];
 
   final AccountBookData _data = AccountBookData(
@@ -183,7 +205,8 @@ class InputFormPage extends StatelessWidget {
   }
 
   Widget _createPaymentTextField() {
-    return TextFormField(
+    String? _ = '';
+    return DropdownButtonFormField(
       autovalidateMode: AutovalidateMode.onUserInteraction,
       decoration: const InputDecoration(
         icon: Icon(Icons.payment),
@@ -200,6 +223,12 @@ class InputFormPage extends StatelessWidget {
         }
         return null;
       },
+      items: _dropdownMenuItems,
+      onChanged: (String? value) {
+        setState(() {
+          _ = value;
+        });
+      },
     );
   }
 
@@ -212,12 +241,19 @@ class InputFormPage extends StatelessWidget {
         labelText: "Money",
       ),
       onSaved: (value) {
+        // 全角文字の場合、半角文字に変換する
+        String halfLengthValue =
+            JapaneseString(value!.replaceAll(",", "").toString())
+                .alphanumericToHalfLength();
         // Save 処理が走った時に処理
-        _data.amount = int.parse(value!);
+        _data.amount = int.parse(halfLengthValue);
       },
       validator: (value) {
         if (value == null || value.isEmpty) {
           return "金額は必須入力項目です";
+        }
+        if (!RegExp(r"^[0-9０-９][0-9０-９,]*$").hasMatch(value)) {
+          return "金額を入力したください";
         }
         return null;
       },
@@ -232,13 +268,16 @@ class InputFormPage extends StatelessWidget {
         hintText: "詳細",
         labelText: "Detail",
       ),
+      keyboardType: TextInputType.multiline,
+      maxLength: 140,
+      maxLines: null,
       onSaved: (value) {
         // Save が走った時に処理
         _data.detail = value.toString();
       },
       validator: (value) {
-        if (value == null || value.isEmpty) {
-          return "詳細は必須入力項目です";
+        if (value != null && value.length > 140) {
+          return "詳細は 140 文字以内です";
         }
         return null;
       },
