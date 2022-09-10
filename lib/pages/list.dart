@@ -3,20 +3,21 @@ import 'package:account_book/entities/account_data.dart';
 import 'package:account_book/pages/input_form.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-const List<Tab> _tabs = <Tab>[
-  Tab(text: "1月"),
-  Tab(text: "2月"),
-  Tab(text: "3月"),
-  Tab(text: "4月"),
-  Tab(text: "5月"),
-  Tab(text: "6月"),
-  Tab(text: "7月"),
-  Tab(text: "8月"),
-  Tab(text: "9月"),
-  Tab(text: "10月"),
-  Tab(text: "11月"),
-  Tab(text: "12月"),
+const List<Map<String, String>> _monthlyData = [
+  {"text": "1月", "value": "01"},
+  {"text": "2月", "value": "02"},
+  {"text": "3月", "value": "03"},
+  {"text": "4月", "value": "04"},
+  {"text": "5月", "value": "05"},
+  {"text": "6月", "value": "06"},
+  {"text": "7月", "value": "07"},
+  {"text": "8月", "value": "08"},
+  {"text": "9月", "value": "09"},
+  {"text": "10月", "value": "10"},
+  {"text": "11月", "value": "11"},
+  {"text": "12月", "value": "12"},
 ];
 
 class ListPage extends StatelessWidget {
@@ -24,6 +25,8 @@ class ListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 今月
+    int thisMonth = int.parse(DateFormat("M").format(DateTime.now()));
     // StreamBuilder を使って、データ更新を自動で行う
     return StreamBuilder<QuerySnapshot>(
       // stream に Stream<QuerySnapshot> を渡す
@@ -37,27 +40,27 @@ class ListPage extends StatelessWidget {
           // List<DocumentSnapshot> を snapshot から取り出す
           final List<DocumentSnapshot> documents = snapshot.data!.docs;
           return DefaultTabController(
-            initialIndex: 0, // 最初に表示するタブ
-            length: _tabs.length, // タブの数
+            initialIndex: thisMonth - 1, // 最初に表示するタブ
+            length: _monthlyData.length, // タブの数
             child: Scaffold(
               drawer: const DrawerSelectYear(),
               appBar: AppBar(
                 title: const Text("家計簿一覧"),
-                bottom: const TabBar(
+                bottom: TabBar(
                   isScrollable: true, // スクロールを有効
-                  tabs: _tabs,
+                  tabs: _monthlyData
+                      .map((month) => Tab(text: month["text"]))
+                      .toList(),
                 ),
               ),
               body: TabBarView(
-                children: _tabs.map(
-                  (Tab tab) {
+                children: _monthlyData.map(
+                  (Map<String, String> monthData) {
                     return SingleChildScrollView(
                       child: Column(
                         children: <Widget>[
                           _createHouseholdAccountBookDetail(
-                            tab.text!,
-                            documents,
-                          ),
+                              documents, monthData),
                         ],
                       ),
                     );
@@ -88,7 +91,7 @@ class ListPage extends StatelessWidget {
   }
 
   Widget _createHouseholdAccountBookDetail(
-      String tabText, List<DocumentSnapshot> documents) {
+      List<DocumentSnapshot> documents, Map<String, String> monthData) {
     return Container(
       padding: const EdgeInsets.only(top: 48),
       child: Column(
@@ -96,7 +99,7 @@ class ListPage extends StatelessWidget {
         children: [
           _createViewHeader(),
           Column(
-            children: _createWordCards(documents),
+            children: _createWordCards(documents, monthData),
           ),
         ],
       ),
@@ -147,106 +150,112 @@ class ListPage extends StatelessWidget {
   }
 
   List<Widget> _createWordCards(
-    List<DocumentSnapshot> documents,
-  ) {
+      List<DocumentSnapshot> documents, Map<String, String> monthData) {
+    const selectedYear = "2022"; // riverpod から値を取り出したい
+
     return documents.map(
       (document) {
-        const colorPrimary = Colors.black12;
-        const colorNegative = Colors.blueAccent;
-        const colorPositive = Colors.greenAccent;
-        final isSpendingTypeString =
-            document["type"] == IncomeSpendingType.spending.name;
-        Icon icon = isSpendingTypeString
-            ? const Icon(
-                Icons.subdirectory_arrow_left_outlined,
-                color: Colors.pink,
-              )
-            : const Icon(
-                Icons.add_box,
-                color: Colors.blue,
-              );
+        if (document["date"].substring(0, 7) ==
+            "$selectedYear/${monthData['value']}") {
+          const colorPrimary = Colors.black12;
+          const colorNegative = Colors.blueAccent;
+          const colorPositive = Colors.greenAccent;
+          final isSpendingTypeString =
+              document["type"] == IncomeSpendingType.spending.name;
+          Icon icon = isSpendingTypeString
+              ? const Icon(
+                  Icons.subdirectory_arrow_left_outlined,
+                  color: Colors.pink,
+                )
+              : const Icon(
+                  Icons.add_box,
+                  color: Colors.blue,
+                );
 
-        return Card(
-          elevation: 8,
-          shadowColor: Colors.grey,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Column(
-            children: [
-              ListTile(
-                leading: ClipOval(
-                  child: Container(
-                    color: colorPrimary,
-                    width: 48,
-                    height: 48,
-                    child: Center(child: icon),
-                  ),
-                ),
-                title: Text(document["item"]),
-                subtitle: Text(document["date"]),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(width: 72),
-                    Container(
-                      width: 16,
-                      height: 16,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: colorPrimary, width: 4),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+          return Card(
+            elevation: 8,
+            shadowColor: Colors.grey,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
+              children: [
+                ListTile(
+                  leading: ClipOval(
+                    child: Container(
+                      color: colorPrimary,
+                      width: 48,
+                      height: 48,
+                      child: Center(child: icon),
                     ),
-                    const SizedBox(width: 8),
-                    Flexible(child: Text(document["detail"])),
-                  ],
+                  ),
+                  title: Text(document["item"]),
+                  subtitle: Text(document["date"]),
                 ),
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Row(
-                  children: [
-                    Container(
-                      decoration: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(color: colorPrimary, width: 2),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(width: 72),
+                      Container(
+                        width: 16,
+                        height: 16,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: colorPrimary, width: 4),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      child: Text(
-                        document["detail"],
-                        style: const TextStyle(color: Colors.blueAccent),
+                      const SizedBox(width: 8),
+                      Flexible(child: Text(document["detail"])),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    children: [
+                      Container(
+                        decoration: const BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(color: colorPrimary, width: 2),
+                          ),
+                        ),
+                        child: Text(
+                          document["detail"],
+                          style: const TextStyle(color: Colors.blueAccent),
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 24),
-                    Expanded(
-                      child: TextButton(
+                      const SizedBox(width: 24),
+                      Expanded(
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+                            foregroundColor: colorNegative,
+                          ),
+                          onPressed: () {},
+                          child: Text(document["detail"]),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                          child: TextButton(
                         style: TextButton.styleFrom(
-                          foregroundColor: colorNegative,
+                          foregroundColor: colorPositive,
+                          backgroundColor: colorPositive.withOpacity(0.2),
                         ),
                         onPressed: () {},
                         child: Text(document["detail"]),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                        child: TextButton(
-                      style: TextButton.styleFrom(
-                        foregroundColor: colorPositive,
-                        backgroundColor: colorPositive.withOpacity(0.2),
-                      ),
-                      onPressed: () {},
-                      child: Text(document["detail"]),
-                    ))
-                  ],
+                      ))
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        );
+              ],
+            ),
+          );
+        } else {
+          return Container();
+        }
       },
     ).toList();
   }
