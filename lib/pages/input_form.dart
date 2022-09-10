@@ -154,7 +154,7 @@ class InputFormPage extends StatelessWidget {
       },
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return "項目は必須入力項目です";
+          return "店舗は必須入力項目です";
         }
         return null;
       },
@@ -196,7 +196,7 @@ class InputFormPage extends StatelessWidget {
       },
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return "項目は必須入力項目です";
+          return "支払方法は必須入力項目です";
         }
         return null;
       },
@@ -238,7 +238,7 @@ class InputFormPage extends StatelessWidget {
       },
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return "項目は必須入力項目です";
+          return "詳細は必須入力項目です";
         }
         return null;
       },
