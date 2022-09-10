@@ -18,7 +18,9 @@ class InputFormPage extends StatelessWidget {
       "", IncomeSpendingType.spending.name, "", "", "", "", 0, "");
 
   // TextFormField で DatePicker を利用する
-  final TextEditingController textEditingController = TextEditingController();
+  final TextEditingController textEditingController = TextEditingController(
+    text: DateFormat("yyyy/MM/dd").format(DateTime.now()),
+  );
 
   @override
   Widget build(BuildContext context, [bool mounted = true]) {
@@ -127,7 +129,11 @@ class InputFormPage extends StatelessWidget {
       },
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return "項目は必須入力項目です";
+          return "日付は必須入力項目です";
+        }
+        if (!RegExp(r"^[0-9]{4}/(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])$")
+            .hasMatch(value)) {
+          return "日付の形式は yyyy/mm/dd の形式です";
         }
         return null;
       },
