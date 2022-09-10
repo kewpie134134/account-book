@@ -20,22 +20,6 @@ class _InputFormPageState extends State<InputFormPage> {
     Tab(text: "収入"),
   ];
 
-  // FireStore からデータを取得したい
-  final List<DropdownMenuItem<String>> _dropdownMenuItems = const [
-    DropdownMenuItem(
-      value: 'aaa',
-      child: Text('aaa'),
-    ),
-    DropdownMenuItem(
-      value: 'bbb',
-      child: Text('bbb'),
-    ),
-    DropdownMenuItem(
-      value: 'ccc',
-      child: Text('ccc'),
-    ),
-  ];
-
   final AccountBookData _data = AccountBookData(
       "", IncomeSpendingType.spending.name, "", "", "", "", 0, "");
 
@@ -46,34 +30,49 @@ class _InputFormPageState extends State<InputFormPage> {
 
   @override
   Widget build(BuildContext context, [bool mounted = true]) {
-    return DefaultTabController(
-      length: _tabs.length,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("家計簿登録"),
-          bottom: TabBar(
-            tabs: _tabs,
-          ),
-        ),
-        body: TabBarView(
-          children: _tabs.map(
-            (Tab tab) {
-              return SingleChildScrollView(
-                child: Column(
-                  children: <Widget>[
-                    _createInputForm(
-                      tab.text!,
-                      _formKey,
-                      context,
-                      mounted,
-                    ),
-                  ],
+    // StreamBuilder を使って最初に 1 度だけ読み込む
+    return FutureBuilder<QuerySnapshot>(
+      // future に Future<QuerySnapshot> を渡す
+      future: FirebaseFirestore.instance
+          .collection("users")
+          .doc("user1")
+          .collection("payment")
+          .get(),
+      builder: ((context, snapshot) {
+        if (snapshot.hasData) {
+          // List<DocumentSnapshot> を snapshot から取り出す
+          final List<DocumentSnapshot> documents = snapshot.data!.docs;
+          return DefaultTabController(
+            length: _tabs.length,
+            child: Scaffold(
+              appBar: AppBar(
+                title: const Text("家計簿登録"),
+                bottom: TabBar(
+                  tabs: _tabs,
                 ),
-              );
-            },
-          ).toList(),
-        ),
-      ),
+              ),
+              body: TabBarView(
+                children: _tabs.map(
+                  (Tab tab) {
+                    return SingleChildScrollView(
+                      child: Column(
+                        children: <Widget>[
+                          _createInputForm(
+                              tab.text!, _formKey, context, mounted, documents),
+                        ],
+                      ),
+                    );
+                  },
+                ).toList(),
+              ),
+            ),
+          );
+        } else if (snapshot.hasError) {
+          return const Text("情報取得に失敗しました。");
+        } else {
+          return const Center(child: CircularProgressIndicator());
+        }
+      }),
     );
   }
 
@@ -82,20 +81,31 @@ class _InputFormPageState extends State<InputFormPage> {
     GlobalKey<FormState> formKey,
     BuildContext context,
     bool mounted,
+    List<DocumentSnapshot> documents,
   ) {
     switch (tabText) {
       case "支出":
         return Column(
           children: [
             _createInputFormArea(
-                formKey, context, mounted, IncomeSpendingType.spending)
+              formKey,
+              context,
+              mounted,
+              IncomeSpendingType.spending,
+              documents,
+            )
           ],
         );
       case "収入":
         return Column(
           children: [
             _createInputFormArea(
-                formKey, context, mounted, IncomeSpendingType.income)
+              formKey,
+              context,
+              mounted,
+              IncomeSpendingType.income,
+              documents,
+            )
           ],
         );
       default:
@@ -103,8 +113,13 @@ class _InputFormPageState extends State<InputFormPage> {
     }
   }
 
-  Widget _createInputFormArea(GlobalKey<FormState> formKey,
-      BuildContext context, bool mounted, IncomeSpendingType type) {
+  Widget _createInputFormArea(
+    GlobalKey<FormState> formKey,
+    BuildContext context,
+    bool mounted,
+    IncomeSpendingType type,
+    List<DocumentSnapshot> documents,
+  ) {
     final isSpendingType = type == IncomeSpendingType.spending;
 
     return SafeArea(
@@ -117,7 +132,7 @@ class _InputFormPageState extends State<InputFormPage> {
               _createDateTextField(context),
               isSpendingType ? _createStoreTextField() : Container(),
               _createItemTextField(),
-              isSpendingType ? _createPaymentTextField() : Container(),
+              isSpendingType ? _createPaymentTextField(documents) : Container(),
               _createMoneyTextField(),
               _createDetailTextField(),
               _createSaveIconButton(
@@ -204,8 +219,7 @@ class _InputFormPageState extends State<InputFormPage> {
     );
   }
 
-  Widget _createPaymentTextField() {
-    String? _ = '';
+  Widget _createPaymentTextField(List<DocumentSnapshot> documents) {
     return DropdownButtonFormField(
       autovalidateMode: AutovalidateMode.onUserInteraction,
       decoration: const InputDecoration(
@@ -223,10 +237,15 @@ class _InputFormPageState extends State<InputFormPage> {
         }
         return null;
       },
-      items: _dropdownMenuItems,
+      items: documents
+          .map((document) => DropdownMenuItem<String>(
+                value: document["payment"],
+                child: Text(document["payment"]),
+              ))
+          .toList(),
       onChanged: (String? value) {
         setState(() {
-          _ = value;
+          value;
         });
       },
     );
