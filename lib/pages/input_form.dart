@@ -297,9 +297,6 @@ class _InputFormPageState extends State<InputFormPage> {
         _data.detail = value.toString();
       },
       validator: (value) {
-        if (value != null && value.length > 140) {
-          return "詳細は 140 文字以内です";
-        }
         return null;
       },
     );
