@@ -220,7 +220,14 @@ class _InputFormPageState extends State<InputFormPage> {
   }
 
   Widget _createPaymentTextField(List<DocumentSnapshot> documents) {
+    final items = documents
+        .map((document) => DropdownMenuItem<String>(
+              value: document["payment"],
+              child: Text(document["payment"]),
+            ))
+        .toList();
     return DropdownButtonFormField(
+      value: items[0].value,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       decoration: const InputDecoration(
         icon: Icon(Icons.payment),
@@ -237,12 +244,7 @@ class _InputFormPageState extends State<InputFormPage> {
         }
         return null;
       },
-      items: documents
-          .map((document) => DropdownMenuItem<String>(
-                value: document["payment"],
-                child: Text(document["payment"]),
-              ))
-          .toList(),
+      items: items,
       onChanged: (String? value) {
         setState(() {
           value;
