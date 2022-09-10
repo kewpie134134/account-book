@@ -9,7 +9,7 @@ class SettingPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text("設定"),
       ),
-      body: const Center(child: Text("設定ページ")),
+      body: const Center(child: Text("設定ページ、payment の種類を変更できるようにしたい")),
     );
   }
 }
