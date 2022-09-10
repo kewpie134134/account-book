@@ -1,4 +1,4 @@
-import 'package:account_book/app.dart';
+import 'package:account_book/app_root.dart';
 import 'package:flutter/material.dart';
 
 class DrawerSelectYear extends StatelessWidget {
@@ -20,7 +20,7 @@ class DrawerSelectYear extends StatelessWidget {
               Navigator.of(context).push<dynamic>(
                 MaterialPageRoute(
                   builder: (context) {
-                    return const App();
+                    return const AppRoute();
                   },
                 ),
               );

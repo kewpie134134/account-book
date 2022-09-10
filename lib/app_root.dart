@@ -3,14 +3,14 @@ import 'package:account_book/pages/list.dart';
 import 'package:account_book/pages/setting.dart';
 import 'package:flutter/material.dart';
 
-class App extends StatefulWidget {
-  const App({Key? key}) : super(key: key);
+class AppRoute extends StatefulWidget {
+  const AppRoute({Key? key}) : super(key: key);
 
   @override
-  State<App> createState() => _AppState();
+  State<AppRoute> createState() => _AppRouteState();
 }
 
-class _AppState extends State<App> {
+class _AppRouteState extends State<AppRoute> {
   static const _screens = [
     ListPage(),
     HomePage(),
