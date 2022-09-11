@@ -1,9 +1,10 @@
 import 'package:account_book/components/drawer_menu.dart';
 import 'package:account_book/entities/account_data.dart';
 import 'package:account_book/pages/input_form.dart';
+import 'package:account_book/stores/selected_date.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 const List<Map<String, String>> _monthlyData = [
   {"text": "1月", "value": "01"},
@@ -20,13 +21,22 @@ const List<Map<String, String>> _monthlyData = [
   {"text": "12月", "value": "12"},
 ];
 
-class ListPage extends StatelessWidget {
+class ListPage extends ConsumerWidget {
   const ListPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    // 今月
-    int thisMonth = int.parse(DateFormat("M").format(DateTime.now()));
+  Widget build(BuildContext context, WidgetRef ref) {
+    // アプリ内で選択されている年を Provider 経由で管理
+    final strSelectedYear = ref.watch(strSelectedYearProvider);
+    final strSelectedYearController =
+        ref.read(strSelectedYearProvider.notifier);
+
+    // アプリ内で選択されている月を Provider 経由で管理
+    final strSelectedMonth = ref.watch(strSelectedMonthProvider);
+    final strSelectedMonthController =
+        ref.read(strSelectedMonthProvider.notifier);
+    int thisMonth = int.parse(strSelectedMonth);
+
     // StreamBuilder を使って、データ更新を自動で行う
     return StreamBuilder<QuerySnapshot>(
       // stream に Stream<QuerySnapshot> を渡す
