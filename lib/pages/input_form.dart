@@ -323,6 +323,13 @@ class _InputFormPageState extends ConsumerState<InputFormPage> {
             _data.doc = DateFormat("yyyyMMddHHmmssSSS").format(now);
             _data.type = type.name;
             formKey.currentState?.save(); // Form の onSaved 関数を実行する
+            // ドキュメントにID追記（リファクタリングする予定）
+            await FirebaseFirestore.instance
+                .collection("users")
+                .doc("user1")
+                .collection("years")
+                .doc(ref.watch(strSelectedYearProvider))
+                .set({"id": ref.watch(strSelectedYearProvider)});
             await FirebaseFirestore.instance
                 .collection("users")
                 .doc("user1")
