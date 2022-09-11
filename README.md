@@ -15,24 +15,26 @@ For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
-## Firestore Constitution
+## Firestore Constitution ver.2
 
 - Collection: users
   - Document: [username]
-    - Collection: datetime
-      - Document: [yyyyMMddHHmmssSSS]
-        - Data:
-        - "type"
-          - [income]
-        - "date"
-          - [yyyymmddhhmmss.xxx]
-        - "store" (only spending)
-          - [stonename]
-        - "item"
-          - [itemname]
-        - "payment" (only spending)
-          - [paymentmethod]
-        - "amount"
-          - [1000]
-        - "detail"
-          - [XXXXXXXXXX]
+    - Collection: years
+      - Document: [yyyy]
+        - Collection: datetime
+          - Document: [MMddHHmmssSSS]
+            - Data:
+              - "type"
+                - [income]
+              - "date"
+                - [yyyymmddhhmmss.xxx]
+              - "store" (only spending)
+                - [stonename]
+              - "item"
+                - [itemname]
+              - "payment" (only spending)
+                - [paymentmethod]
+              - "amount"
+                - [1000]
+              - "detail"
+                - [XXXXXXXXXX]

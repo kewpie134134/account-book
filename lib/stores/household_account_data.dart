@@ -5,6 +5,8 @@ final householdAccountDataProvider = StreamProvider((ref) {
   final collection = FirebaseFirestore.instance
       .collection("users")
       .doc("user1")
+      .collection("years")
+      .doc("2022")
       .collection("datetime");
 
   final Stream<List<Map<String, dynamic>>> stream =

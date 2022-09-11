@@ -322,6 +322,8 @@ class _InputFormPageState extends State<InputFormPage> {
             await FirebaseFirestore.instance
                 .collection("users")
                 .doc("user1")
+                .collection("years")
+                .doc("2022")
                 .collection("datetime")
                 .doc(_data.doc)
                 .set(_data.toMap());
