@@ -56,27 +56,25 @@ class ListPage extends ConsumerWidget {
         body: TabBarView(
           children: _monthlyData.map(
             (Map<String, String> monthData) {
-              return Container(
-                child: householdAccountDataList.when(
-                  data: (data) {
-                    return SingleChildScrollView(
-                      child: Column(
-                        children: <Widget>[
-                          _createHouseholdAccountBookDetail(data, monthData),
-                        ],
-                      ),
-                    );
-                  },
-                  error: (error, stackTrace) {
-                    return Text(
-                      error.toString(),
-                      style: const TextStyle(fontSize: 24),
-                    );
-                  },
-                  loading: () {
-                    return const Center(child: CircularProgressIndicator());
-                  },
-                ),
+              return householdAccountDataList.when(
+                data: (data) {
+                  return SingleChildScrollView(
+                    child: Column(
+                      children: <Widget>[
+                        _createHouseholdAccountBookDetail(data, monthData),
+                      ],
+                    ),
+                  );
+                },
+                error: (error, stackTrace) {
+                  return Text(
+                    error.toString(),
+                    style: const TextStyle(fontSize: 24),
+                  );
+                },
+                loading: () {
+                  return const Center(child: CircularProgressIndicator());
+                },
               );
             },
           ).toList(),
