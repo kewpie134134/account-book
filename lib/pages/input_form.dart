@@ -1,18 +1,20 @@
+import 'package:account_book/stores/selected_date.dart';
 import 'package:account_book/utils/half_length.dart';
 import 'package:account_book/entities/account_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-class InputFormPage extends StatefulWidget {
+class InputFormPage extends ConsumerStatefulWidget {
   const InputFormPage({Key? key}) : super(key: key);
 
   @override
-  State<InputFormPage> createState() => _InputFormPageState();
+  ConsumerState<InputFormPage> createState() => _InputFormPageState();
 }
 
-class _InputFormPageState extends State<InputFormPage> {
+class _InputFormPageState extends ConsumerState<InputFormPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final List<Tab> _tabs = const <Tab>[
@@ -30,7 +32,7 @@ class _InputFormPageState extends State<InputFormPage> {
 
   @override
   Widget build(BuildContext context, [bool mounted = true]) {
-    // StreamBuilder を使って最初に 1 度だけ読み込む
+    // FutureBuilder を使って最初に 1 度だけ読み込む
     return FutureBuilder<QuerySnapshot>(
       // future に Future<QuerySnapshot> を渡す
       future: FirebaseFirestore.instance
@@ -160,6 +162,8 @@ class _InputFormPageState extends State<InputFormPage> {
       onSaved: (value) {
         // Save 処理が走った時に処理
         _data.date = value.toString();
+        ref.read(strSelectedYearProvider.notifier).state =
+            value.toString().substring(0, 4);
       },
       onTap: () {
         _getDate(context);
@@ -323,7 +327,7 @@ class _InputFormPageState extends State<InputFormPage> {
                 .collection("users")
                 .doc("user1")
                 .collection("years")
-                .doc("2022")
+                .doc(ref.watch(strSelectedYearProvider)) // 家計簿データの年度を指定
                 .collection("datetime")
                 .doc(_data.doc)
                 .set(_data.toMap());
