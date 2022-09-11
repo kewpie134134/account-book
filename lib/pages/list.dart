@@ -1,8 +1,8 @@
 import 'package:account_book/components/drawer_menu.dart';
 import 'package:account_book/entities/account_data.dart';
 import 'package:account_book/pages/input_form.dart';
+import 'package:account_book/stores/household_account_data.dart';
 import 'package:account_book/stores/selected_date.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -37,71 +37,68 @@ class ListPage extends ConsumerWidget {
         ref.read(strSelectedMonthProvider.notifier);
     int thisMonth = int.parse(strSelectedMonth);
 
-    // StreamBuilder を使って、データ更新を自動で行う
-    return StreamBuilder<QuerySnapshot>(
-      // stream に Stream<QuerySnapshot> を渡す
-      stream: FirebaseFirestore.instance
-          .collection("users")
-          .doc("user1")
-          .collection("datetime")
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          // List<DocumentSnapshot> を snapshot から取り出す
-          final List<DocumentSnapshot> documents = snapshot.data!.docs;
-          return DefaultTabController(
-            initialIndex: thisMonth - 1, // 最初に表示するタブ
-            length: _monthlyData.length, // タブの数
-            child: Scaffold(
-              drawer: const DrawerSelectYear(),
-              appBar: AppBar(
-                title: const Text("家計簿一覧"),
-                bottom: TabBar(
-                  isScrollable: true, // スクロールを有効
-                  tabs: _monthlyData
-                      .map((month) => Tab(text: month["text"]))
-                      .toList(),
-                ),
-              ),
-              body: TabBarView(
-                children: _monthlyData.map(
-                  (Map<String, String> monthData) {
+    // StreamProvider で管理している家計簿情報を取得
+    final householdAccountDataList = ref.watch(householdAccountDataProvider);
+
+    return DefaultTabController(
+      initialIndex: thisMonth - 1, // 最初に表示するタブ
+      length: _monthlyData.length, // タブの数
+      child: Scaffold(
+        drawer: const DrawerSelectYear(),
+        appBar: AppBar(
+          title: const Text("家計簿一覧"),
+          bottom: TabBar(
+            isScrollable: true, // スクロールを有効
+            tabs:
+                _monthlyData.map((month) => Tab(text: month["text"])).toList(),
+          ),
+        ),
+        body: TabBarView(
+          children: _monthlyData.map(
+            (Map<String, String> monthData) {
+              return Container(
+                child: householdAccountDataList.when(
+                  data: (data) {
                     return SingleChildScrollView(
                       child: Column(
                         children: <Widget>[
-                          _createHouseholdAccountBookDetail(
-                              documents, monthData),
+                          _createHouseholdAccountBookDetail(data, monthData),
                         ],
                       ),
                     );
                   },
-                ).toList(),
-              ),
-              floatingActionButton: FloatingActionButton(
-                child: const Icon(Icons.add),
-                onPressed: () {
-                  Navigator.of(context).push<dynamic>(
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return const InputFormPage();
-                      },
-                    ),
-                  );
+                  error: (error, stackTrace) {
+                    return Text(
+                      error.toString(),
+                      style: const TextStyle(fontSize: 24),
+                    );
+                  },
+                  loading: () {
+                    return const Center(child: CircularProgressIndicator());
+                  },
+                ),
+              );
+            },
+          ).toList(),
+        ),
+        floatingActionButton: FloatingActionButton(
+          child: const Icon(Icons.add),
+          onPressed: () {
+            Navigator.of(context).push<dynamic>(
+              MaterialPageRoute(
+                builder: (context) {
+                  return const InputFormPage();
                 },
               ),
-            ),
-          );
-        } else if (snapshot.hasError) {
-          return const Text("情報取得に失敗しました。");
-        } else {
-          return const Center(child: CircularProgressIndicator());
-        }
-      },
+            );
+          },
+        ),
+      ),
     );
   }
 
   Widget _createHouseholdAccountBookDetail(
-      List<DocumentSnapshot> documents, Map<String, String> monthData) {
+      List<Map<String, dynamic>> documents, Map<String, String> monthData) {
     return Container(
       padding: const EdgeInsets.only(top: 48),
       child: Column(
@@ -160,7 +157,7 @@ class ListPage extends ConsumerWidget {
   }
 
   List<Widget> _createWordCards(
-      List<DocumentSnapshot> documents, Map<String, String> monthData) {
+      List<Map<String, dynamic>> documents, Map<String, String> monthData) {
     const selectedYear = "2022"; // riverpod から値を取り出したい
 
     return documents.map(
