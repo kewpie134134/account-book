@@ -1,12 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final householdAccountDataProvider = StreamProvider((ref) {
+final householdAccountDataProvider =
+    StreamProvider.family<List<Map<String, dynamic>>, String>(
+        (ref, strSelectedYear) {
   final collection = FirebaseFirestore.instance
       .collection("users")
       .doc("user1")
       .collection("years")
-      .doc("2022")
+      .doc(strSelectedYear)
       .collection("datetime");
 
   final Stream<List<Map<String, dynamic>>> stream =

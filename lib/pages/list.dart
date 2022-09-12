@@ -28,8 +28,6 @@ class ListPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // アプリ内で選択されている年を Provider 経由で管理
     final strSelectedYear = ref.watch(strSelectedYearProvider);
-    final strSelectedYearController =
-        ref.read(strSelectedYearProvider.notifier);
 
     // アプリ内で選択されている月を Provider 経由で管理
     final strSelectedMonth = ref.watch(strSelectedMonthProvider);
@@ -38,7 +36,8 @@ class ListPage extends ConsumerWidget {
     int thisMonth = int.parse(strSelectedMonth);
 
     // StreamProvider で管理している家計簿情報を取得
-    final householdAccountDataList = ref.watch(householdAccountDataProvider);
+    final householdAccountDataList =
+        ref.watch(householdAccountDataProvider(strSelectedYear));
 
     return DefaultTabController(
       initialIndex: thisMonth - 1, // 最初に表示するタブ
@@ -48,6 +47,9 @@ class ListPage extends ConsumerWidget {
         appBar: AppBar(
           title: const Text("家計簿一覧"),
           bottom: TabBar(
+            onTap: (value) {
+              strSelectedMonthController.state = (value + 1).toString();
+            },
             isScrollable: true, // スクロールを有効
             tabs:
                 _monthlyData.map((month) => Tab(text: month["text"])).toList(),
@@ -61,7 +63,11 @@ class ListPage extends ConsumerWidget {
                   return SingleChildScrollView(
                     child: Column(
                       children: <Widget>[
-                        _createHouseholdAccountBookDetail(data, monthData),
+                        _createHouseholdAccountBookDetail(
+                          data,
+                          monthData,
+                          strSelectedYear,
+                        ),
                       ],
                     ),
                   );
@@ -96,7 +102,10 @@ class ListPage extends ConsumerWidget {
   }
 
   Widget _createHouseholdAccountBookDetail(
-      List<Map<String, dynamic>> documents, Map<String, String> monthData) {
+    List<Map<String, dynamic>> documents,
+    Map<String, String> monthData,
+    String strSelectedYear,
+  ) {
     return Container(
       padding: const EdgeInsets.only(top: 48),
       child: Column(
@@ -104,7 +113,11 @@ class ListPage extends ConsumerWidget {
         children: [
           _createViewHeader(),
           Column(
-            children: _createWordCards(documents, monthData),
+            children: _createWordCards(
+              documents,
+              monthData,
+              strSelectedYear,
+            ),
           ),
         ],
       ),
@@ -155,13 +168,14 @@ class ListPage extends ConsumerWidget {
   }
 
   List<Widget> _createWordCards(
-      List<Map<String, dynamic>> documents, Map<String, String> monthData) {
-    const selectedYear = "2022"; // riverpod から値を取り出したい
-
+    List<Map<String, dynamic>> documents,
+    Map<String, String> monthData,
+    String strSelectedYear,
+  ) {
     return documents.map(
       (document) {
         if (document["date"].substring(0, 7) ==
-            "$selectedYear/${monthData['value']}") {
+            "$strSelectedYear/${monthData['value']}") {
           const colorPrimary = Colors.black12;
           const colorNegative = Colors.blueAccent;
           const colorPositive = Colors.greenAccent;
