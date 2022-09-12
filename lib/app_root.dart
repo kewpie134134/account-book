@@ -11,9 +11,9 @@ class AppRoute extends StatefulWidget {
 }
 
 class _AppRouteState extends State<AppRoute> {
-  static const _screens = [
-    ListPage(),
-    HomePage(),
+  static final List<StatefulWidget> _screens = [
+    const ListPage(),
+    const HomePage(),
     SettingPage(),
   ];
   int _selectedIndex = 0;

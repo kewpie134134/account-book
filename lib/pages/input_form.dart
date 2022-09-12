@@ -224,10 +224,11 @@ class _InputFormPageState extends ConsumerState<InputFormPage> {
   }
 
   Widget _createPaymentTextField(List<DocumentSnapshot> documents) {
-    final items = documents
-        .map((document) => DropdownMenuItem<String>(
-              value: document["payment"],
-              child: Text(document["payment"]),
+    final List<dynamic> paymentList = documents.toList()[0]["payment"];
+    final List<DropdownMenuItem<String>> items = paymentList
+        .map((payment) => DropdownMenuItem<String>(
+              value: payment,
+              child: Text(payment),
             ))
         .toList();
     return DropdownButtonFormField(
