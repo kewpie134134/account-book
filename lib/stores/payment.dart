@@ -7,8 +7,6 @@ final paymentItemsProvider = FutureProvider((ref) {
       .doc("user1")
       .collection("payment");
 
-  // List<String> pointlist = List.from(value.data['point']);
-
   return collection.get().then((snapshot) {
     return snapshot.docs.map((doc) {
       return doc.data();
