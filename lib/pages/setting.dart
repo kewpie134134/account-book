@@ -3,6 +3,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+// 支払方法のリストを Provider で管理
+final paymentItemListProvider = StateProvider<List>((ref) {
+  return [];
+});
+
 class SettingPage extends ConsumerWidget {
   SettingPage({Key? key}) : super(key: key);
 
@@ -11,7 +16,6 @@ class SettingPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref, [bool mounted = true]) {
-    final paymentItems = ref.watch(paymentItemsProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text("設定"),
@@ -22,12 +26,19 @@ class SettingPage extends ConsumerWidget {
             key: _formKey,
             child: Padding(
               padding: const EdgeInsets.all(20.0),
-              child: paymentItems.when(
+              child: ref.watch(paymentItemsProvider).when(
                 data: (data) {
+                  ref.read(paymentItemListProvider.notifier).state =
+                      data.toList()[0]["payment"];
                   return Column(
                     children: <Widget>[
-                      _createPaymentSettingTextField(data),
-                      _createSettingConfirmButton(_formKey, context, mounted),
+                      _createPaymentSettingTextField(ref),
+                      _createSettingConfirmButton(
+                        _formKey,
+                        context,
+                        mounted,
+                        ref,
+                      ),
                     ],
                   );
                 },
@@ -48,8 +59,8 @@ class SettingPage extends ConsumerWidget {
     );
   }
 
-  Widget _createPaymentSettingTextField(Iterable<dynamic> data) {
-    final String initialValue = data.toList()[0]["payment"].join(",");
+  Widget _createPaymentSettingTextField(WidgetRef ref) {
+    final String initialValue = ref.read(paymentItemListProvider).join(",");
 
     return TextFormField(
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -60,6 +71,8 @@ class SettingPage extends ConsumerWidget {
       ),
       onSaved: (value) {
         // Save 処理が走った時に処理
+        ref.read(paymentItemListProvider.notifier).state =
+            value.toString().split(",");
       },
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -72,10 +85,11 @@ class SettingPage extends ConsumerWidget {
     );
   }
 
-  _createSettingConfirmButton(
+  Widget _createSettingConfirmButton(
     GlobalKey<FormState> formKey,
     BuildContext context,
     bool mounted,
+    WidgetRef ref,
   ) {
     return Padding(
       padding: const EdgeInsets.all(30),
@@ -85,14 +99,15 @@ class SettingPage extends ConsumerWidget {
           // validate を実行
           if (formKey.currentState!.validate()) {
             formKey.currentState?.save(); // Form の onSaved 関数を実行する
-            await FirebaseFirestore.instance
+            FirebaseFirestore.instance
                 .collection("users")
                 .doc("user1")
                 .collection("payment")
-                .doc("array");
-            // .set(data);
-            // payment の値を配列の形でセットして Firestore に PUT したい
-            // その際、riverpod 経由でできるとよいかも。
+                .doc("array")
+                .set({
+              "payment":
+                  FieldValue.arrayUnion(ref.read(paymentItemListProvider))
+            });
             // ついでに、input_form.dart の payment GET のロジックも修正したい
           }
         },
