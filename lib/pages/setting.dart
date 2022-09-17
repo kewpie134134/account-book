@@ -72,10 +72,13 @@ class SettingPage extends ConsumerWidget {
       },
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return "支払方法を入力してください";
-        }
-        if (!RegExp(r"^[^,]+$").hasMatch(value)) {
           return "支払方法はカンマ(,)で区切って入力してください";
+        }
+        if (!RegExp(r"^[^,]").hasMatch(value)) {
+          return "先頭文字はカンマ(,)以外を入力してください";
+        }
+        if (!RegExp(r"[^,]$").hasMatch(value)) {
+          return "最後の文字はカンマ(,)以外を入力してください";
         }
         // 支払方法の区切り(,)をバリデーションする
         return null;
