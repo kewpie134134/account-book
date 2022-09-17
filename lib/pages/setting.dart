@@ -9,13 +9,13 @@ final paymentItemListProvider = StateProvider<List>((ref) {
 });
 
 class SettingPage extends ConsumerWidget {
-  SettingPage({Key? key}) : super(key: key);
+  const SettingPage({Key? key}) : super(key: key);
 
   // 入力フォームを監視するための FormKey
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  static final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref, [bool mounted = true]) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("設定"),
@@ -28,15 +28,13 @@ class SettingPage extends ConsumerWidget {
               padding: const EdgeInsets.all(20.0),
               child: ref.watch(paymentItemsProvider).when(
                 data: (data) {
-                  ref.read(paymentItemListProvider.notifier).state =
-                      data.toList()[0]["payment"];
                   return Column(
                     children: <Widget>[
-                      _createPaymentSettingTextField(ref),
+                      _createPaymentSettingTextField(
+                          ref, data.toList()[0]["payment"]),
                       _createSettingConfirmButton(
                         _formKey,
                         context,
-                        mounted,
                         ref,
                       ),
                     ],
@@ -59,9 +57,7 @@ class SettingPage extends ConsumerWidget {
     );
   }
 
-  Widget _createPaymentSettingTextField(WidgetRef ref) {
-    final String initialValue = ref.read(paymentItemListProvider).join(",");
-
+  Widget _createPaymentSettingTextField(WidgetRef ref, List paymentItemsList) {
     return TextFormField(
       autovalidateMode: AutovalidateMode.onUserInteraction,
       decoration: const InputDecoration(
@@ -78,17 +74,19 @@ class SettingPage extends ConsumerWidget {
         if (value == null || value.isEmpty) {
           return "支払方法を入力してください";
         }
+        if (!RegExp(r"^[^,]+$").hasMatch(value)) {
+          return "支払方法はカンマ(,)で区切って入力してください";
+        }
         // 支払方法の区切り(,)をバリデーションする
         return null;
       },
-      initialValue: initialValue,
+      initialValue: paymentItemsList.join(","),
     );
   }
 
   Widget _createSettingConfirmButton(
     GlobalKey<FormState> formKey,
     BuildContext context,
-    bool mounted,
     WidgetRef ref,
   ) {
     return Padding(

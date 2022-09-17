@@ -14,7 +14,7 @@ class _AppRouteState extends State<AppRoute> {
   static final List<StatefulWidget> _screens = [
     const ListPage(),
     const HomePage(),
-    SettingPage(),
+    const SettingPage(),
   ];
   int _selectedIndex = 0;
 
