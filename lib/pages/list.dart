@@ -112,13 +112,7 @@ class ListPage extends ConsumerWidget {
         mainAxisSize: MainAxisSize.max,
         children: [
           _createViewHeader(),
-          Column(
-            children: _createWordCards(
-              documents,
-              monthData,
-              strSelectedYear,
-            ),
-          ),
+          _createWordCards(documents, monthData, strSelectedYear),
         ],
       ),
     );
@@ -167,115 +161,117 @@ class ListPage extends ConsumerWidget {
     );
   }
 
-  List<Widget> _createWordCards(
+  Widget _createWordCards(
     List<Map<String, dynamic>> documents,
     Map<String, String> monthData,
     String strSelectedYear,
   ) {
-    return documents.map(
-      (document) {
-        if (document["date"].substring(0, 7) ==
-            "$strSelectedYear/${monthData['value']}") {
-          const colorPrimary = Colors.black12;
-          const colorNegative = Colors.blueAccent;
-          const colorPositive = Colors.greenAccent;
-          final isSpendingTypeString =
-              document["type"] == IncomeSpendingType.spending.name;
-          Icon icon = isSpendingTypeString
-              ? const Icon(
-                  Icons.subdirectory_arrow_left_outlined,
-                  color: Colors.pink,
-                )
-              : const Icon(
-                  Icons.add_box,
-                  color: Colors.blue,
-                );
+    return Column(
+      children: documents.map(
+        (document) {
+          if (document["date"].substring(0, 7) ==
+              "$strSelectedYear/${monthData['value']}") {
+            const colorPrimary = Colors.black12;
+            const colorNegative = Colors.blueAccent;
+            const colorPositive = Colors.greenAccent;
+            final isSpendingTypeString =
+                document["type"] == IncomeSpendingType.spending.name;
+            Icon icon = isSpendingTypeString
+                ? const Icon(
+                    Icons.subdirectory_arrow_left_outlined,
+                    color: Colors.pink,
+                  )
+                : const Icon(
+                    Icons.add_box,
+                    color: Colors.blue,
+                  );
 
-          return Card(
-            elevation: 8,
-            shadowColor: Colors.grey,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(
-              children: [
-                ListTile(
-                  leading: ClipOval(
-                    child: Container(
-                      color: colorPrimary,
-                      width: 48,
-                      height: 48,
-                      child: Center(child: icon),
-                    ),
-                  ),
-                  title: Text(document["item"]),
-                  subtitle: Text(document["date"]),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(width: 72),
-                      Container(
-                        width: 16,
-                        height: 16,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: colorPrimary, width: 4),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+            return Card(
+              elevation: 8,
+              shadowColor: Colors.grey,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: ClipOval(
+                      child: Container(
+                        color: colorPrimary,
+                        width: 48,
+                        height: 48,
+                        child: Center(child: icon),
                       ),
-                      const SizedBox(width: 8),
-                      Flexible(child: Text(document["detail"])),
-                    ],
+                    ),
+                    title: Text(document["item"]),
+                    subtitle: Text(document["date"]),
                   ),
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Row(
-                    children: [
-                      Container(
-                        decoration: const BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(color: colorPrimary, width: 2),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(width: 72),
+                        Container(
+                          width: 16,
+                          height: 16,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: colorPrimary, width: 4),
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        child: Text(
-                          document["detail"],
-                          style: const TextStyle(color: Colors.blueAccent),
+                        const SizedBox(width: 8),
+                        Flexible(child: Text(document["detail"])),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Row(
+                      children: [
+                        Container(
+                          decoration: const BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(color: colorPrimary, width: 2),
+                            ),
+                          ),
+                          child: Text(
+                            document["detail"],
+                            style: const TextStyle(color: Colors.blueAccent),
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 24),
-                      Expanded(
-                        child: TextButton(
+                        const SizedBox(width: 24),
+                        Expanded(
+                          child: TextButton(
+                            style: TextButton.styleFrom(
+                              foregroundColor: colorNegative,
+                            ),
+                            onPressed: () {},
+                            child: Text(document["detail"]),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                            child: TextButton(
                           style: TextButton.styleFrom(
-                            foregroundColor: colorNegative,
+                            foregroundColor: colorPositive,
+                            backgroundColor: colorPositive.withOpacity(0.2),
                           ),
                           onPressed: () {},
                           child: Text(document["detail"]),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                          child: TextButton(
-                        style: TextButton.styleFrom(
-                          foregroundColor: colorPositive,
-                          backgroundColor: colorPositive.withOpacity(0.2),
-                        ),
-                        onPressed: () {},
-                        child: Text(document["detail"]),
-                      ))
-                    ],
+                        ))
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-          );
-        } else {
-          return Container();
-        }
-      },
-    ).toList();
+                ],
+              ),
+            );
+          } else {
+            return Container();
+          }
+        },
+      ).toList(),
+    );
   }
 }
