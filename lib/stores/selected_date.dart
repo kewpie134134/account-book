@@ -8,5 +8,5 @@ final strSelectedYearProvider = StateProvider((ref) {
 });
 
 final strSelectedMonthProvider = StateProvider((ref) {
-  return DateFormat("M").format(now);
+  return DateFormat("MM").format(now);
 });
