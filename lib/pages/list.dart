@@ -43,9 +43,20 @@ class ListPage extends ConsumerWidget {
       initialIndex: thisMonth - 1, // 最初に表示するタブ
       length: _monthlyData.length, // タブの数
       child: Scaffold(
-        drawer: const DrawerSelectYear(),
+        drawer: const DrawerSelectYear(), // Drawer Widget
         appBar: AppBar(
           title: const Text("家計簿一覧"),
+          leading: Builder(
+            builder: (BuildContext context) {
+              return IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
+                },
+                tooltip: 'ユーザー情報と年度選択',
+              );
+            },
+          ),
           bottom: TabBar(
             onTap: (value) {
               strSelectedMonthController.state = (value + 1).toString();

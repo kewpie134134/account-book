@@ -17,6 +17,7 @@ class DrawerSelectYear extends ConsumerWidget {
       child: ListView(
         children: <Widget>[
           const UserAccountsDrawerHeader(
+            decoration: BoxDecoration(color: Colors.blue),
             accountName: Text("user1"),
             accountEmail: Text("example@example.com"),
           ),
