@@ -127,7 +127,11 @@ class ListPage extends ConsumerWidget {
             monthData,
             strSelectedYear,
           ),
-          _createWordCards(documents, monthData, strSelectedYear),
+          _createWordCards(
+            documents,
+            monthData,
+            strSelectedYear,
+          ),
         ],
       ),
     );
