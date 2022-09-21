@@ -199,8 +199,8 @@ class ListPage extends ConsumerWidget {
           if (document["date"].substring(0, 7) ==
               "$strSelectedYear/${monthData['value']}") {
             const colorPrimary = Colors.black12;
-            const colorNegative = Colors.blueAccent;
-            const colorPositive = Colors.greenAccent;
+            const colorDetailButton = Colors.black;
+            const colorEditButton = Colors.blueAccent;
             final isSpendingTypeString =
                 document["type"] == IncomeSpendingType.spending.name;
             Icon icon = isSpendingTypeString
@@ -221,17 +221,31 @@ class ListPage extends ConsumerWidget {
               ),
               child: Column(
                 children: [
-                  ListTile(
-                    leading: ClipOval(
-                      child: Container(
-                        color: colorPrimary,
-                        width: 48,
-                        height: 48,
-                        child: Center(child: icon),
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: ListTile(
+                          leading: ClipOval(
+                            child: Container(
+                              color: colorPrimary,
+                              width: 48,
+                              height: 48,
+                              child: Center(child: icon),
+                            ),
+                          ),
+                          title: Text(document["item"]),
+                          subtitle: Text(document["store"]),
+                        ),
                       ),
-                    ),
-                    title: Text(document["item"]),
-                    subtitle: Text(document["date"]),
+                      Expanded(
+                        flex: 1,
+                        child: ListTile(
+                          title: Text(document["item"]),
+                          subtitle: Text(document["store"]),
+                        ),
+                      ),
+                    ],
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -239,16 +253,11 @@ class ListPage extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(width: 72),
-                        Container(
-                          width: 16,
-                          height: 16,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: colorPrimary, width: 4),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
+                        const Icon(
+                          Icons.calendar_month,
                         ),
                         const SizedBox(width: 8),
-                        Flexible(child: Text(document["detail"])),
+                        Flexible(child: Text(document["date"])),
                       ],
                     ),
                   ),
@@ -257,36 +266,27 @@ class ListPage extends ConsumerWidget {
                         const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Row(
                       children: [
-                        Container(
-                          decoration: const BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(color: colorPrimary, width: 2),
-                            ),
-                          ),
-                          child: Text(
-                            document["detail"],
-                            style: const TextStyle(color: Colors.blueAccent),
-                          ),
-                        ),
                         const SizedBox(width: 24),
                         Expanded(
                           child: TextButton(
                             style: TextButton.styleFrom(
-                              foregroundColor: colorNegative,
+                              foregroundColor: colorDetailButton,
+                              backgroundColor:
+                                  colorDetailButton.withOpacity(0.2),
                             ),
                             onPressed: () {},
-                            child: Text(document["detail"]),
+                            child: const Text("詳細"),
                           ),
                         ),
                         const SizedBox(width: 8),
                         Expanded(
                             child: TextButton(
                           style: TextButton.styleFrom(
-                            foregroundColor: colorPositive,
-                            backgroundColor: colorPositive.withOpacity(0.2),
+                            foregroundColor: colorEditButton,
+                            backgroundColor: colorEditButton.withOpacity(0.2),
                           ),
                           onPressed: () {},
-                          child: Text(document["detail"]),
+                          child: const Text("編集"),
                         ))
                       ],
                     ),
