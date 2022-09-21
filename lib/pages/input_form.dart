@@ -262,7 +262,7 @@ class _InputFormPageState extends ConsumerState<InputFormPage> {
     return TextFormField(
       autovalidateMode: AutovalidateMode.onUserInteraction,
       decoration: const InputDecoration(
-        icon: Icon(CupertinoIcons.money_dollar),
+        icon: Icon(CupertinoIcons.money_yen),
         hintText: "金額",
         labelText: "Money",
       ),
