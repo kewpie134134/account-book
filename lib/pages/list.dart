@@ -111,14 +111,26 @@ class ListPage extends ConsumerWidget {
       child: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
-          _createViewHeader(),
+          _createViewHeader(
+            documents,
+            monthData,
+            strSelectedYear,
+          ),
           _createWordCards(documents, monthData, strSelectedYear),
         ],
       ),
     );
   }
 
-  Widget _createViewHeader() {
+  Widget _createViewHeader(
+    List<Map<String, dynamic>> documents,
+    Map<String, String> monthData,
+    String strSelectedYear,
+  ) {
+    final postsLength = (documents.where((document) {
+      return document["date"].substring(0, 7) ==
+          "$strSelectedYear/${monthData['value']}";
+    }).length);
     return Row(
       children: [
         Expanded(
@@ -136,7 +148,7 @@ class ListPage extends ConsumerWidget {
               ),
             ),
             title: const Text('Posts'),
-            subtitle: const Text('20 Posts'),
+            subtitle: Text("$postsLength Posts"),
           ),
         ),
         Expanded(
