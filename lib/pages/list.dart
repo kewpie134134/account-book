@@ -143,9 +143,20 @@ class ListPage extends ConsumerWidget {
     Map<String, String> monthData,
     String strSelectedYear,
   ) {
+    var spendingAmount = 0;
+    var incomeAmount = 0;
     final postsLength = (documents.where((document) {
-      return document["date"].substring(0, 7) ==
-          "$strSelectedYear/${monthData['value']}";
+      if (document["date"].substring(0, 7) ==
+          "$strSelectedYear/${monthData['value']}") {
+        if (document["type"] == IncomeSpendingType.spending.name) {
+          spendingAmount += document["amount"] as int;
+        } else {
+          incomeAmount += document["amount"] as int;
+        }
+        return true;
+      } else {
+        return false;
+      }
     }).length);
     return Row(
       children: [
@@ -163,8 +174,8 @@ class ListPage extends ConsumerWidget {
                 ),
               ),
             ),
-            title: const Text('Posts'),
-            subtitle: Text("$postsLength Posts"),
+            title: const Text('家計簿数'),
+            subtitle: Text("$postsLength 件"),
           ),
         ),
         Expanded(
@@ -181,8 +192,26 @@ class ListPage extends ConsumerWidget {
                 ),
               ),
             ),
-            title: const Text('All Types'),
-            subtitle: const Text(''),
+            title: const Text('支出総額'),
+            subtitle: Text("${spendingAmount.toString()} 円"),
+          ),
+        ),
+        Expanded(
+          flex: 1,
+          child: ListTile(
+            leading: ClipOval(
+              child: Container(
+                color: Colors.grey[300],
+                width: 48,
+                height: 48,
+                child: Icon(
+                  Icons.style,
+                  color: Colors.grey[800],
+                ),
+              ),
+            ),
+            title: const Text('収入総額'),
+            subtitle: Text("${incomeAmount.toString()} 円"),
           ),
         ),
       ],
