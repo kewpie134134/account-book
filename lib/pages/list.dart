@@ -46,7 +46,7 @@ class ListPage extends ConsumerWidget {
       child: Scaffold(
         drawer: const DrawerSelectYear(), // Drawer Widget
         appBar: AppBar(
-          title: const Text("家計簿一覧"),
+          title: Text("$strSelectedYear年 家計簿一覧"),
           leading: Builder(
             builder: (BuildContext context) {
               return IconButton(

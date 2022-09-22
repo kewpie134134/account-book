@@ -26,7 +26,13 @@ class DrawerSelectYear extends ConsumerWidget {
               return Column(
                 children: data.map((doc) {
                   return ListTile(
-                    title: Text(doc),
+                    title: Text(
+                      doc,
+                      style: doc ==
+                              ref.watch(strSelectedYearProvider.notifier).state
+                          ? const TextStyle(fontWeight: FontWeight.bold)
+                          : const TextStyle(fontWeight: FontWeight.normal),
+                    ),
                     onTap: () {
                       // 選択した年を Provider に知らせる
                       strSelectedYearController.state = doc;
