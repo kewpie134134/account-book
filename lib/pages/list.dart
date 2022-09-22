@@ -3,6 +3,7 @@ import 'package:account_book/entities/account_data.dart';
 import 'package:account_book/pages/input_form.dart';
 import 'package:account_book/stores/household_account_data.dart';
 import 'package:account_book/stores/selected_date.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -226,23 +227,46 @@ class ListPage extends ConsumerWidget {
                       Expanded(
                         flex: 1,
                         child: ListTile(
-                          leading: ClipOval(
-                            child: Container(
-                              color: colorPrimary,
-                              width: 48,
-                              height: 48,
-                              child: Center(child: icon),
+                            leading: ClipOval(
+                              child: Container(
+                                color: colorPrimary,
+                                width: 48,
+                                height: 48,
+                                child: Center(child: icon),
+                              ),
                             ),
-                          ),
-                          title: Text(document["item"]),
-                          subtitle: Text(document["store"]),
-                        ),
+                            title: Row(
+                              children: <Widget>[
+                                const Icon(Icons.library_books),
+                                const SizedBox(width: 8),
+                                Text(document["item"]),
+                              ],
+                            ),
+                            subtitle: Row(
+                              children: <Widget>[
+                                const Icon(Icons.store),
+                                const SizedBox(width: 8),
+                                Text(document["store"]),
+                              ],
+                            )),
                       ),
                       Expanded(
                         flex: 1,
                         child: ListTile(
-                          title: Text(document["item"]),
-                          subtitle: Text(document["store"]),
+                          title: Row(
+                            children: <Widget>[
+                              const Icon(CupertinoIcons.money_yen),
+                              const SizedBox(width: 8),
+                              Text("${document["amount"].toString()}円"),
+                            ],
+                          ),
+                          subtitle: Row(
+                            children: <Widget>[
+                              const Icon(Icons.payment),
+                              const SizedBox(width: 8),
+                              Text(document["payment"]),
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -252,12 +276,17 @@ class ListPage extends ConsumerWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(width: 72),
+                        const SizedBox(width: 68),
                         const Icon(
                           Icons.calendar_month,
+                          color: Colors.grey,
                         ),
                         const SizedBox(width: 8),
-                        Flexible(child: Text(document["date"])),
+                        Flexible(
+                            child: Text(
+                          document["date"],
+                          style: const TextStyle(color: Colors.black),
+                        )),
                       ],
                     ),
                   ),
@@ -266,7 +295,6 @@ class ListPage extends ConsumerWidget {
                         const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Row(
                       children: [
-                        const SizedBox(width: 24),
                         Expanded(
                           child: TextButton(
                             style: TextButton.styleFrom(
