@@ -10,7 +10,8 @@ final StreamProviderFamily<List<Map<String, dynamic>>, String>
       .doc("user1")
       .collection("years")
       .doc(strSelectedYear)
-      .collection("datetime");
+      .collection("datetime")
+      .orderBy("date", descending: true);
 
   final Stream<List<Map<String, dynamic>>> stream =
       collection.snapshots().map((col) {
@@ -26,7 +27,8 @@ final FutureProvider<List<String>> householdAccountYearProvider =
   final collection = FirebaseFirestore.instance
       .collection("users")
       .doc("user1")
-      .collection("years");
+      .collection("years")
+      .orderBy("id", descending: true);
 
   return collection.get().then((snapshot) {
     return snapshot.docs.map((doc) {
